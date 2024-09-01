@@ -15,8 +15,8 @@ PHANTOM_USER="42069"
 
 # Pick one
 #UPDATE_COMMAND="echo \"[ERROR] Auto-updates disabled!\"; exit 1;"
- UPDATE_COMMAND="git clone --recursive https://github.com/GuzioMG/hackathon2023.git update;"  # CHANGE GITHUB URL!  # DON'T CHANGE TARGET NAME!  # Make sure `scripts` and `docker-compose.yml` are at repo root.  # If you're a psychopath (or need a private repo), use `gh` instead.
-#UPDATE_COMMAND="wget https://example.com/minecraft.zip; unzip minecraft.zip; rm -vf minecraft.zip"  # CHANGE URL AND (optional) FILENAME!  # Must contain one folder `update` at root, and `scripts` and `docker-compose.yml` inside it.  # If you're a psychopath (no other possible reason), use `curl` instead.
+ UPDATE_COMMAND="git clone --recursive https://github.com/Team-GhostLand/magic-sauce.git update;"  # CHANGE GITHUB URL!  # DON'T CHANGE TARGET NAME!  # Make sure `scripts` and `docker-compose.yml` are at repo root (other files/folders at repo root are permitted, but will be ignored).  # If you're a psychopath (or need a private repo), use `gh` instead.
+#UPDATE_COMMAND="wget https://example.com/minecraft.zip; unzip minecraft.zip; rm -vf minecraft.zip"  # CHANGE URL AND (optional) FILENAME!  # Must contain exactly one folder `update` at root, and `scripts` and `docker-compose.yml` inside it (other files/folders inside `update` are permitted, but will be ignored).  # If you're a psychopath (no other possible reason), use `curl` or `tar` instead.
 
 
  
