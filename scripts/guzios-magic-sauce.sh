@@ -572,7 +572,7 @@ if [ "$1" = "help" ]; then
     echo;
     echo " ---RÓŻNE---";
     echo "  - test"
-    echo "     \ Zwraca exit code 0."
+    echo "     \ Zwraca exit code 0. Używane wewnętrznie."
     echo "  - help"
     echo "     \ Pokazuje ten ekran."
     echo;
