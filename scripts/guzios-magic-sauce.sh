@@ -306,14 +306,14 @@ if [ "$1" = "install" ]; then
 
     sleep 3;
     echo;
-    echo " ---STEP 5/7: FIXOWN---";
+    echo " ---STEP 4/7: FIXOWN---";
     echo "Pożegnaj się z tym logiem - mega-spam za 10s...";
     sleep 10;
     $INSTALL_PATH fixown;
 
     sleep 3;
     echo;
-    echo " ---STEP 4/7: SEDDING---";
+    echo " ---STEP 5/7: SEDDING---";
     sed -i -e "s/%DOCKER_GROUP_ID%/$GROUPID/g" "./docker-compose.yml";
     if [ $? -ne 0 ]; then
         echo "Błąd nie jest na tyle poważny, by przerywać przez niego instalację.";
