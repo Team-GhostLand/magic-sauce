@@ -19,7 +19,7 @@ PHANTOM_USER="42069"
 #UPDATE_COMMAND="wget https://example.com/minecraft.zip; unzip minecraft.zip; rm -vf minecraft.zip"  # CHANGE URL AND (optional) FILENAME!  # Must contain exactly one folder `update` at root, and `scripts` and `docker-compose.yml` inside it (other files/folders inside `update` are permitted, but will be ignored).  # If you're a psychopath (no other possible reason), use `curl` or `tar` instead.
 
 
- 
+
 
   #   ===== SETUP =====
 
