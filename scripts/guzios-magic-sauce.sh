@@ -45,6 +45,7 @@ fi
 WORKDIR_NOTE="[[Working from: $(pwd)]]"
 SUDO_NOTE="ERROR: This script must be ran as root!"
 INSTALL_PATH="%INSTALL_PATH%"
+INSTALL_PATH_LITERAL=$'\x25\x49\x4e\x53\x54\x41\x4c\x4c\x5f\x50\x41\x54\x48\x25'
 SCRIPT_PATH="$(pwd)/scripts/guzios-magic-sauce.sh"
 
 
@@ -426,11 +427,11 @@ if [ "$1" = "update" ]; then
 
     echo;
     echo " ---STEP 5/6: SEDDING---";
-    sed -i -e "s/%INSTALL_PATH%/$INSTALL_PATH/g" "$SCRIPT_PATH";
+    sed -i -e "s:$INSTALL_PATH_LITERAL:$INSTALL_PATH:g" "$SCRIPT_PATH"; #THIS THING WILL BREAK!!! But I have
     if [ $? -ne 0 ]; then
-        echo "SED wywalił błąd! Nie udało się zamienić %INSTALL_PATH% na $INSTALL_PATH.";
+        echo "SED wywalił błąd! Nie udało się zamienić $INSTALL_PATH_LITERAL na $INSTALL_PATH.";
         echo "W związku z błędem, aktualizację trzeba dokończyć manualnie:"
-        echo "  - Zamień %INSTALL_PATH% na $INSTALL_PATH w pliku $SCRIPT_PATH";
+        echo "  - Zamień $INSTALL_PATH_LITERAL na $INSTALL_PATH w pliku $SCRIPT_PATH";
         echo "  - Wykonaj komendę \`sudo $SCRIPT_PATH install\`";
         exit 1;
     fi
