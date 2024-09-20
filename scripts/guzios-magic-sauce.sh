@@ -401,7 +401,14 @@ if [ "$1" = "update" ]; then
     echo;
     echo " ---STEP 3/6: COPYING---";
     cp --verbose --recursive "./update/scripts" "$(pwd)";
-    if cmp -s "./update/docker-compose.yml" "$(pwd)/docker-compose.yml"; then
+    cp "./update/docker-compose.yml" "./update/docker-compose-test.yml";
+    GROUPID=$(cat /etc/group | grep docker | cut -d: -f3)
+    if [ -z "$GROUPID" ]; then
+        GROUPID="SOMETHING_IS_WRONG_BUT_IT_IS_NOT_MY_PROBLEM"
+    fi
+    sed -i -e "s/%DOCKER_GROUP_ID%/$GROUPID/g" "./update/docker-compose-test.yml";
+    
+    if cmp -s "./update/docker-compose-test.yml" "./docker-compose.yml"; then
         cp --verbose "./update/docker-compose.yml" "$(pwd)/docker-compose.yml";
     else
         echo "UWAGA! Definicje Kompozytora różnią się między wersjami.";
