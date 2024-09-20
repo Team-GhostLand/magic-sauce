@@ -427,7 +427,7 @@ if [ "$1" = "update" ]; then
 
     echo;
     echo " ---STEP 5/6: SEDDING---";
-    sed -i -e "s:$INSTALL_PATH_LITERAL:$INSTALL_PATH:g" "$SCRIPT_PATH"; #THIS THING WILL BREAK!!! But I have
+    sed -i -e "s:$INSTALL_PATH_LITERAL:$INSTALL_PATH:g" "$SCRIPT_PATH";
     if [ $? -ne 0 ]; then
         echo "SED wywalił błąd! Nie udało się zamienić $INSTALL_PATH_LITERAL na $INSTALL_PATH.";
         echo "W związku z błędem, aktualizację trzeba dokończyć manualnie:"
