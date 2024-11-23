@@ -1,7 +1,7 @@
 services:
   minecraft:
     # Konfiguracja Dockera
-    image: "itzg/minecraft-server:java17-graalvm"
+    image: "itzg/minecraft-server:java21-graalvm"
     tty: true
     stdin_open: true
     ports:
