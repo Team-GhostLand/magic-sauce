@@ -18,8 +18,7 @@ services:
     environment:
       # Wersja
       TYPE: "NEOFORGE"
-      NEOFORGE_LAUNCHER_VERSION: "21.1.72"
-      NEOFORGE_LOADER_VERSION: "0.15.11"
+      NEOFORGE_VERSION: "21.1.72"
       VERSION: "1.21.1"
       # Minecraft stuff
       GUI: "FALSE"
