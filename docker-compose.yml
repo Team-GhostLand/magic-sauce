@@ -7,7 +7,7 @@ services:
     ports:
       - "25565:25565"
     volumes:
-      - ./minecraft/gl5:/data
+      - ./minecraft/gl6:/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mc-health"]
@@ -17,10 +17,10 @@ services:
     # Konfiguracja MC
     environment:
       # Wersja
-      TYPE: "FABRIC"
-      FABRIC_LAUNCHER_VERSION: "1.0.1"
-      FABRIC_LOADER_VERSION: "0.15.11"
-      VERSION: "1.20.1"
+      TYPE: "NEOFORGE"
+      NEOFORGE_LAUNCHER_VERSION: "21.1.72"
+      NEOFORGE_LOADER_VERSION: "0.15.11"
+      VERSION: "1.21.1"
       # Minecraft stuff
       GUI: "FALSE"
       EULA: "TRUE"              #  Dlaczego niektóre wartości boolean są pisane wielką literą...
@@ -29,7 +29,7 @@ services:
       USE_AIKAR_FLAGS: "true"   #  ...a inne małą? No fucking idea! Ale tak było w docsach, więc się trzymam.
       # Misc
       UID: "42069"
-      GID: "%DOCKER_GROUP_ID%"
+      GID: "121"
       TZ: "Europe/Warsaw"
       LOG_TIMESTAMP: "true"
 #  
@@ -48,5 +48,5 @@ services:
       #BACKUP_NAME: "full"
       #PRUNE_BACKUPS_DAYS: 3
     #volumes:
-      #- ./minecraft/gl5:/data:ro
-      #- ./backups/gl5:/backups
+      #- ./minecraft/gl6:/data:ro
+      #- ./backups/gl6:/backups
