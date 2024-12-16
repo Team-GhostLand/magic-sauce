@@ -1,6 +1,6 @@
 services:
   minecraft:
-    # Konfiguracja Dockera
+    # Docker Config
     image: "itzg/minecraft-server:java21-graalvm"
     tty: true
     stdin_open: true
@@ -14,18 +14,18 @@ services:
       start_period: 210s #3,5m
       interval: 3s
       retries: 40
-    # Konfiguracja MC
+    # MC Config
     environment:
-      # Wersja
+      # Version
       TYPE: "NEOFORGE"
       NEOFORGE_VERSION: "21.1.72"
       VERSION: "1.21.1"
       # Minecraft stuff
       GUI: "FALSE"
-      EULA: "TRUE"              #  Dlaczego niektóre wartości boolean są pisane wielką literą...
+      EULA: "TRUE"              #  Why are some bools upper-case...
       # Java stuff
       MEMORY: "20G"
-      USE_AIKAR_FLAGS: "true"   #  ...a inne małą? No fucking idea! Ale tak było w docsach, więc się trzymam.
+      USE_AIKAR_FLAGS: "true"   #  ...and others lower-? No fucking idea! I'm just following the docs, that's all.
       # Misc
       UID: "42069"
       GID: "121"
