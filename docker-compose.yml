@@ -26,7 +26,7 @@ services:
       USE_AIKAR_FLAGS: "true"   #  ...and others lower-? No fucking idea! I'm just following the docs, that's all.
       # Misc
       UID: "42069"
-      GID: "121"
+      GID: "%DOCKER_GROUP_ID%"
       TZ: "Europe/Warsaw"
       LOG_TIMESTAMP: "true"
 #  
