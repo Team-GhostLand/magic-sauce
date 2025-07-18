@@ -136,52 +136,28 @@ if [ "$1" = "workdir" ]; then
     exit;
 fi
 
-if [ "$1" = "claim" ]; then
-    if [ "$EUID" -ne 0 ]; then
-        echo "$SUDO_NOTE";
-        exit 1;
-    fi
-
-    echo "$WORKDIR_NOTE";
-    echo;
-    # Why am I giving read+write+exec perms to things that SHOULD only need read+write perms? Because WRITING breaks without exec, if you don't own the file. Ye, I didn't know this, either. Trust me, you're happy you didn't learn this the hard way.
-    chmod --verbose --recursive 770 .;
-    chmod --verbose 070 .;
-    chmod --verbose --recursive 050 ./scripts;
-    chmod --verbose 070 ./docker-compose.yml;
-    echo "Now, server-owned files are also accessible to everyone in the \`docker\` group. Keep in mind, that you're still";
-    echo "not their owner - merely a guest allowed inside. This is important, because if you CREATE file here, you'll become";
-    echo "its owner, which may break the server's acces. As such, should you ever create a file here, make sure to run";
-    echo "\`sudo minecraft fixown\`. Don't worry, editing/viewing/removing files is fine. Only creation causes problems.";
-    echo "Also, for security reasons, you are not allowed to edit scripts. You can change this with \`sudo minecraft scriptown\`.";
-    exit 0;
-fi
-
-if [ "$1" = "scriptown" ]; then
-    if [ "$EUID" -ne 0 ]; then
-        echo "$SUDO_NOTE";
-        exit 1;
-    fi
-
-    echo "$WORKDIR_NOTE";
-    echo;
-    echo "Granting everone in the \`docker\` gropup write access to the scripts folder.";
-    echo "Remember to run \`sudo minecraft fixown\` or \`sudo minecraft claim\` (depending"
-    echo "on whether or not you created some new scripts) after you're done, to give up script";
-    echo "write permissions - thus securing your sever against anyone trying to exploit the scripts.";
-    chmod --verbose --recursive 070 ./scripts;
-    exit;
-fi
-
 if [ "$1" = "fixown" ]; then
     if [ "$EUID" -ne 0 ]; then
         echo "$SUDO_NOTE";
         exit 1;
     fi
 
-    $SCRIPT_PATH claim;
+    echo "$WORKDIR_NOTE";
+    echo;
+    # Why am I giving read+write+exec perms to things that SHOULD only need read+write perms? Because folders in Linux need execute permissions to be writable. Stupid? Yes! But what can we do about it?
+    chmod --verbose --recursive 770 .;
+    chmod --verbose 070 .;
+    chmod --verbose --recursive 050 ./scripts;
+    chmod --verbose 040 ./docker-compose.yml;
     chown --verbose --recursive "$PHANTOM_USER:docker" .;
-    exit;
+    echo "Now, server-owned files are also accessible to everyone in the \`docker\` group. Keep in mind that";
+    echo "you're stil not their owner - that honor belongs to user $PHANTOM_USER. You are merely a guest allowed inside.";
+    echo "This, however, won't be the case for any file you CREATE here - which is pretty bad, as this could";
+    echo "make said file inaccessible to the server. As such, should you ever create a file here, make sure to run";
+    echo "\`sudo minecraft fixown\` again. Don't worry, editing/viewing/removing files is fine. Only creation";
+    echo "causes problems. Also, for security reasons, you cannot edit scripts or compose. To change anything,";
+    echo "please edit them on GitHub and run \`sudo minecraft update\`. In DIRE situations, edit them as root.";
+    exit 0;
 fi
 
 if [ "$1" = "unlock" ]; then
@@ -334,7 +310,7 @@ if [ "$1" = "install" ]; then
     sleep 3;
     echo;
     echo " ---STEP 7/7: FISH---";
-    SUBCOMMANDS="start stop send health restart workdir claim scriptown fixown unlock install uninstall update reinstall startd allow test help"
+    SUBCOMMANDS="start stop send health restart workdir fixown unlock install uninstall update reinstall startd allow test help"
     COMPLETIONS="complete -c minecraft -a '$SUBCOMMANDS'"
     echo "Zapisywanie \`$COMPLETIONS\` do \`$FISH_PATH\`.";
     echo "$COMPLETIONS" > "$FISH_PATH";
@@ -344,7 +320,7 @@ if [ "$1" = "install" ]; then
     echo " ---INSTALACJA ZAKOŃCZONA SUKCESEM!---";
     echo;
     echo "Dodaj wszystkich ważnych adminów do grupy \`docker\`. W ten sposób, będą oni mogli:";
-    echo "  - Dowolnie interaktować z workdirem - chodź czasem będzie to wymagało zrobienia \`sudo minecraft claim\`"
+    echo "  - Dowolnie interaktować z workdirem - chodź czasem będzie to wymagało zrobienia \`sudo minecraft fixown\`"
     echo "    lub \`sudo minecraft scriptown\` (don't worry, to nie psuje permisji serwera - tylko pamiętaj o \`sudo minecraft fixown\`).";
     echo "  - Wykonywać część komend (np. startować serwer) jako \`minecraft [komenda]\`, a nie \`sudo minecraft [komenda]\` - sprawdź \`minecraft help\` po listę.";
     echo "  - Widzieć auto-completion \`minecraft\` i \`sudo minecraft\`.";
@@ -372,7 +348,7 @@ if [ "$1" = "uninstall" ]; then
     echo "Uninstalled."
     echo;
     echo "Keep in mind, that $(pwd) still exists with all"
-    echo "of its content, as uninstalling only reverts steps taken during \`install\` (excpet Docker),"
+    echo "of its content, as uninstalling only reverts steps taken during \`install\` (except Docker),"
     echo "and $(pwd)'s creation wasn't a part of the installation."
     exit 0;
 fi
@@ -395,8 +371,42 @@ if [ "$1" = "update" ]; then
 
     echo;
     echo " ---STEP 2/6: UNINSTALLING+DELETEING THE OLDER SCRIPT---";
+    
     $SCRIPT_PATH uninstall;
+    if [ $? -ne 0 ]; then
+        echo "Couldn't uninstall! See above for errors.";
+        exit 1;
+    fi
+    
+    chmod --verbose --recursive 777 "./scripts";
+    if [ $? -ne 0 ]; then
+        echo "Couldn't configure script permissions ahead of deletion! See above for errors.";
+        exit 1;
+    fi
+    
+    chmod --verbose 777 "./docker-compose.yml";
+    if [ $? -ne 0 ]; then
+        echo "Couldn't configure compose permissions ahead of overwrite! See above for errors.";
+        chmod --verbose --recursive 050 "./scripts";
+        if [ $? -ne 0 ]; then
+            echo "Couldn't restore script permissions after the recent failure! THIS LEAVES YOUR SERVER IN A VULNERABLE STATE, PLEASE FIX ASAP! See above for errors.";
+        fi
+        exit 1;
+    fi
+    
     rm -rdfv "./scripts";
+    if [ $? -ne 0 ]; then
+        echo "Couldn't delete the scripts folder! See above for errors.";
+        chmod --verbose --recursive 050 "./scripts";
+        if [ $? -ne 0 ]; then
+            echo "Couldn't restore script permissions after the recent failure! THIS LEAVES YOUR SERVER IN A VULNERABLE STATE, PLEASE FIX ASAP! See above for errors.";
+        fi
+        chmod --verbose --recursive 040 "./docker-compose.yml";
+        if [ $? -ne 0 ]; then
+            echo "Couldn't restore compose permissions after the recent failure! THIS LEAVES YOUR SERVER IN A VULNERABLE STATE, PLEASE FIX ASAP! See above for errors.";
+        fi
+        exit 1;
+    fi
 
     echo;
     echo " ---STEP 3/6: COPYING---";
@@ -542,17 +552,12 @@ if [ "$1" = "help" ]; then
     echo "  [UWAGA: Wszystkie pod-komendy poza \`workdir\` należy wykonać jako root, nawet jeśli jest się w grupie \`docker\`!]"
     echo "  - workdir"
     echo "     \ Pokazuje folder, z poziomu którego operuje ten skrypt."
-    echo "  - claim"
-    echo "     \ Serwer lubi czasem zabrać innym permisje do swojego folderu. Ta pod-komenda ustawia permisje w taki sposób, że:"
-    echo "       a) Członkowie grupy \`docker\` mogą bez problemu interaktować z workdirem (nie licząc edycji skryptów) - dosłownie claimujesz go, stąd nazwa."
-    echo "       c) Serwer będzie działać. (Co ważne, bo jeśli ustawia się permisje manualnie - można go przypadkiem zablokować. Z doświadczenia.)"
-    echo "       d) Exposowane są minimalne wymagane uprawnienia, aby osiągnąć wszystko powyżej - thus minimalizując attack surface."
-    echo "       UWAGA: Rób \`sudo minecraft fixown\` ZAWSZE, gdy DODAJESZ pliki!!!!!!!!"
-    echo "  - scriptown"
-    echo "     \ Pozwala członkom grupy \`docker\` edytować skrypty."
-    echo "       UWAGA: Dla bezpieczeństwa, zrób \`sudo minecraft claim\` po zakończonej pracy, aby zresetować permisje."
     echo "  - fixown"
-    echo "     \ Jak 'claim', ale dodatkowo ustawia użytkowników, nie tylko permisje. Wykonuje się automatycznie przy instalacji."
+    echo "     \ Serwer lubi czasem zabrać innym permisje do swojego folderu. Ta pod-komenda ustawia permisje w taki sposób, że:"
+    echo "       a) Członkowie grupy \`docker\` mogą bez problemu interaktować z workdirem (nie licząc edycji skryptów i compose)."
+    echo "       b) Serwer będzie działać. (Co ważne, bo jeśli ustawia się permisje manualnie - można go przypadkiem zablokować. Z doświadczenia.)"
+    echo "       c) Exposowane są minimalne wymagane uprawnienia, aby osiągnąć wszystko powyżej - thus minimalizując attack surface."
+    echo "       Fixown dodatkowo ustawia ownership na $PHANTOM_USER:docker, na wypadek gdyby permisje popsuły się „odwrotnie” (dla serwera).";
     echo "       UWAGA: Rób to ZAWSZE, gdy DODAJESZ pliki!!!!!!!!"
     echo "  - unlock"
     echo "     \ Usuwa lockfile."
@@ -592,10 +597,9 @@ if [ "$1" = "help" ]; then
     echo "       oraz \`docker-compose.yml\` i wskazać je na nowego Fantomowego Użytkownika, a następnie wykonać \`sudo minecraft fixown\`."
     echo "  - Permisje"
     echo "     \ Dodaj wszystkich ważnych adminów do grupy \`docker\`. W ten sposób, będą oni mogli:";
-    echo "         - Dowolnie interaktować z workdirem - chodź czasem będzie to wymagało zrobienia \`sudo minecraft claim\`"
-    echo "           lub \`sudo minecraft scriptown\` (don't worry, to nie psuje permisji serwera - tylko pamiętaj o \`sudo minecraft fixown\`).";
-    echo "         - Wykonywać część komend (np. startować serwer) jako \`minecraft [komenda]\`, a nie \`sudo minecraft [komenda]\` - patrz powyżej po listę.";
-    echo "         - Widzieć auto-completion \`minecraft\` i \`sudo minecraft\`.";
+    echo "         - Dowolnie interaktować z workdirem - chodź czasem będzie to wymagało zrobienia \`sudo minecraft fixown\`"
+    echo "         - Wykonywać część komend (np. startować serwer) jako \`minecraft [komenda]\`, a nie \`sudo minecraft [komenda]\` - patrz powyżej po listę."
+    echo "         - Widzieć auto-completion \`minecraft\` i \`sudo minecraft\`."
     echo "       Zrobisz to za pomocą \`sudo minecraft allow <NAZWA_UŻYTKOWNIKA>\`."
     echo "  - Zmiana lokalizacji FISHa"
     echo "     \ Na linijce 13 w tym skrypcie, znajduje się zmienna, której wartość wskazuje na położenie pliku z autocomplete FISHa."
