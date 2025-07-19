@@ -195,7 +195,7 @@ if [ "$1" = "install" ]; then
     fi
 
     HAS_COMPOSE=YES
-    docker compose help > /dev/null 2> /dev/null;
+    docker compose > /dev/null 2> /dev/null;
     if [ $? -ne 0 ]; then
         HAS_COMPOSE=NO
     fi
