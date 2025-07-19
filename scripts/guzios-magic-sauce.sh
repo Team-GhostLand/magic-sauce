@@ -10,7 +10,6 @@
 
 
 DEFAULT_FISH_PATH="/usr/share/fish/vendor_completions.d/minecraft.fish"
-FISH_PATH=$DEFAULT_FISH_PATH
 PHANTOM_USER="42069"
 
 # Pick one
@@ -39,6 +38,10 @@ cd "$DIR/../" || exit;
 STOPPED_NOTE="NOTE: The server seems to be offline. If this command fails, run \`minecraft start\` and try again."
 if [ -e "minecraft.lock" ]; then
     STOPPED_NOTE=""
+fi
+
+if [ -z "$FISH_PATH" ]; then
+    FISH_PATH=$DEFAULT_FISH_PATH
 fi
 
 # Common strings:
