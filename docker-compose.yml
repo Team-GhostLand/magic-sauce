@@ -1,3 +1,5 @@
+name: "ghostland"
+
 services:
   minecraft:
     # Docker Config

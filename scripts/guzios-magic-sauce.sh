@@ -69,17 +69,26 @@ if [ "$1" = "start" ]; then
     echo;
 
     if [ -e "minecraft.lock" ]; then
-        echo "ERROR: The server is already starting/running.";
-        echo "If you are ABSOLUTLEY 100% CERTAIN it is not - run \`sudo minecraft unlock\`.";
-        exit 1;
+        echo "NOTE: The server is already starting/running.";
+        echo;
+        echo "This isn't a problem - the command does nothing in such a case.";
+        echo "...Unless docker-compose.yml changed - then we'll reboot only";
+        echo "those containers that had something changed about them.";
+        echo "Please watch the logs below to see exaclty what happens.";
+        echo;
+        echo "(note that if it's the Minecraft server that ends up restarting, you'll";
+        echo "have to run \`minecraft\` from a different terminal to see the logs)";
+        echo;
+    else
+        touch "minecraft.lock";
+        echo "Server powering up. If you want to spectate the logs as it starts, run \`minecraft\` from a different terminal.";
+        echo;
     fi
-    touch "minecraft.lock";
-
-    echo "Server powering up. If you want to spectate the logs as it starts, run \`minecraft\` from a different terminal.";
+    
     docker compose up -d;
     if [ $? -ne 0 ]; then
         echo "ERROR: Docker threw an exception. If it was something about not being able to open a socket, then:";
-        echo "  - Make sure you are a member of the \`docker\` group. You can check it and add yourself to it using \`sudo minecraft allow <USERNAME>\`.";
+        echo "  - Make sure you are a member of the \`docker\` group. You can add users to it using \`sudo minecraft allow <USERNAME>\`.";
         echo "  - Make sure that the Docker Daemon is running. You can check it and start it automatically using \`sudo minecraft startd\`.";
         echo "  - Go cry in a corner, in case the above solutions fail - most likely, Docker is borked somehow.";
         rm "minecraft.lock";
@@ -89,33 +98,26 @@ if [ "$1" = "start" ]; then
 fi
 
 if [ "$1" = "stop" ]; then
-    echo "Server powering down. If you want to spectate the logs as it stops, run \`minecraft\` from a different terminal.";
-    docker compose down;
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Docker threw an exception. Since we are unable to verify whether that means that the server stopped or not,";
-        echo "you'll need to figure this out on your own. If it really is stopped, make sure to run \`sudo minecraft unlock\`";
-        echo "to remove the lockfile and allow the server to be started again. If it's not stopped - try this command again,"
-        echo "stop the Docker Daemon, or give it the \`htop\` treatment. DO NOT remove the lockfile until the server is stopped.";
-        exit 1;
-    fi
+    echo "Minecraft server powering down. If you want to spectate its logs as it stops, run \`minecraft\` from a different terminal.";
     rm "minecraft.lock";
+    docker compose stop "minecraft";
     exit;
 fi
 
 if [ "$1" = "send" ]; then
     if [ -z "$2" ]; then
         echo "$STOPPED_NOTE";
-        docker exec -i ghostland-minecraft-1 rcon-cli;
+        docker exec -i "ghostland-minecraft-1" "rcon-cli";
         exit 0;
     fi
     echo "Attempting to execute: \`/$2\`";
     echo "$STOPPED_NOTE";
-    docker exec ghostland-minecraft-1 rcon-cli "$2";
+    docker exec "ghostland-minecraft-1" "rcon-cli" "$2";
     exit 0;
 fi
 
 if [ "$1" = "health" ]; then
-    docker container inspect -f "{{.State.Health.Status}}" ghostland-minecraft-1;
+    docker container inspect -f "{{.State.Health.Status}}" "ghostland-minecraft-1";
     exit;
 fi
 
@@ -160,16 +162,9 @@ if [ "$1" = "fixown" ]; then
     exit 0;
 fi
 
-if [ "$1" = "unlock" ]; then
-    if [ "$EUID" -ne 0 ]; then
-        echo "$SUDO_NOTE";
-        exit 1;
-    fi
-
-    echo "$WORKDIR_NOTE";
-    echo;
+if [ "$1" = "mark-stopped" ]; then
     rm --verbose "minecraft.lock";
-    exit 0;
+    exit;
 fi
 
 
@@ -310,7 +305,7 @@ if [ "$1" = "install" ]; then
     sleep 3;
     echo;
     echo " ---STEP 7/7: FISH---";
-    SUBCOMMANDS="start stop send health restart workdir fixown unlock install uninstall update reinstall startd allow test help"
+    SUBCOMMANDS="start stop stopall send health restart workdir fixown mark-stopped install uninstall update reinstall startd allow test help"
     COMPLETIONS="complete -c minecraft -a '$SUBCOMMANDS'"
     echo "Zapisywanie \`$COMPLETIONS\` do \`$FISH_PATH\`.";
     echo "$COMPLETIONS" > "$FISH_PATH";
@@ -518,6 +513,18 @@ if [ "$1" = "allow" ]; then
     exit;
 fi
 
+if [ "$1" = "stopall" ]; then
+    if [ "$EUID" -ne 0 ]; then
+        echo "$SUDO_NOTE";
+        exit 1;
+    fi
+    
+    echo "Everything powering down. If you want to spectate Minecraft's logs as it stops, run \`minecraft\` from a different terminal.";
+    rm "minecraft.lock";
+    docker compose down;
+    exit;
+fi
+
 
 
  #  === MISC. ===
@@ -531,10 +538,10 @@ if [ "$1" = "help" ]; then
     echo "  - (brak parametru)"
     echo "     \ Podłącza konsolę. Z konsoli może korzystać kilka osób na raz i da się nią scrollować. Take that, \`screen\`!"
     echo "  - start"
-    echo "     \ Uruchamia serwer. Jeśli chcesz monitorować status startowania, wpisz \`minecraft\` z osobnej sesji SSH."
+    echo "     \ TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO (*works, but no docs)"
     echo "  - stop"
-    echo "     \ Zatrzymuje serwer. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft\` z osobnej sesji SSH."
-    echo "       UWAGA: To jest JEDYNY sposób na zatrzymanie serwera - użycie \`/stop\` w MC ztriggeruje auto-restart."
+    echo "     \ Zatrzymuje serwer MC. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft\` z osobnej sesji SSH."
+    echo "       UWAGA: Komendy stop i stopall to JEDYNY sposób na zatrzymanie serwera MC - użycie \`/stop\` w MC ztriggeruje auto-restart."
     echo "  - send"
     echo "     \ Otwiera interaktywne menu RCON."
     echo "       UWAGA: Podobnie, jak w konsoli MC - nie pisz slasha na początku!"
@@ -549,7 +556,6 @@ if [ "$1" = "help" ]; then
     echo "     \ Restartuje serwer. Jeśli chcesz monitorować status restartowania, wpisz \`minecraft\` z osobnej sesji SSH."
     echo;
     echo " ---ZARZĄDZANIE FOLDEREM---";
-    echo "  [UWAGA: Wszystkie pod-komendy poza \`workdir\` należy wykonać jako root, nawet jeśli jest się w grupie \`docker\`!]"
     echo "  - workdir"
     echo "     \ Pokazuje folder, z poziomu którego operuje ten skrypt."
     echo "  - fixown"
@@ -559,9 +565,9 @@ if [ "$1" = "help" ]; then
     echo "       c) Exposowane są minimalne wymagane uprawnienia, aby osiągnąć wszystko powyżej - thus minimalizując attack surface."
     echo "       Fixown dodatkowo ustawia ownership na $PHANTOM_USER:docker, na wypadek gdyby permisje popsuły się „odwrotnie” (dla serwera).";
     echo "       UWAGA: Rób to ZAWSZE, gdy DODAJESZ pliki!!!!!!!!"
-    echo "  - unlock"
-    echo "     \ Usuwa lockfile."
-    echo "       UWAGA: Uruchom tą pod-komendę tylko, jeśli masz ABSOLUTNĄ, 100%OWĄ PEWNOŚĆ, że serwer jest wyłączony."
+    echo "       [Tę komendę należy wykonać jako root, nawet jeśli jest się w grupie \`docker\`!]"
+    echo "  - mark-stopped"
+    echo "     \ Usuwa lockfile. Wpływa to jedynie na wiadomości tekstowe, więc RACZEJ powinno być bezpieczne (nawet, jeśli serwer tak na prawdę nie jest wyłączony)."
     echo;
     echo " ---ZARZĄDZANIE SKRYPTEM---";
     echo "  [UWAGA: Wszystkie pod-komendy należy wykonać jako root, nawet jeśli jest się w grupie \`docker\`!]"
@@ -582,6 +588,9 @@ if [ "$1" = "help" ]; then
     echo "     \ Uruchamia daemon Dockera. Powinno wrzucić go również do autostartu, ale to nie zawsze działa."
     echo "  - allow <NAZWA_UŻYTKOWNIKA>"
     echo "     \ Dodaje wybranego użytkownika do grupy \`docker\`."
+    echo "  - stopall"
+    echo "     \ Zatrzymuje WSZYSTKO. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft\` z osobnej sesji SSH."
+    echo "       UWAGA: WSZYSTKO = każdy serwis w Compose. Używać tylko w awaryjnch przypadkach lub przy wyłączaniu maszyny!"
     echo;
     echo " ---RÓŻNE---";
     echo "  - test"
