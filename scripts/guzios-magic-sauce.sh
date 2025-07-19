@@ -189,13 +189,13 @@ if [ "$1" = "install" ]; then
     fi
 
     HAS_DOCKER=YES
-    docker version > /dev/null 2> /dev/null;
+    docker help > /dev/null 2> /dev/null;
     if [ $? -ne 0 ]; then
         HAS_DOCKER=NO
     fi
 
     HAS_COMPOSE=YES
-    docker compose version > /dev/null 2> /dev/null;
+    docker compose help > /dev/null 2> /dev/null;
     if [ $? -ne 0 ]; then
         HAS_COMPOSE=NO
     fi
