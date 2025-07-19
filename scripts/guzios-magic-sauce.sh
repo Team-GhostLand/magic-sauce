@@ -419,9 +419,8 @@ if [ "$1" = "update" ]; then
     if cmp -s "./update/docker-compose-test.yml" "./docker-compose.yml"; then
         cp --verbose "./update/docker-compose.yml" "$(pwd)/docker-compose.yml";
     else
-        echo "UWAGA! Definicje Kompozytora różnią się między wersjami.";
-        echo "Aby poprawnie zaaplikować update, konieczny będzie MANAULNY, PEŁEN";
-        echo "restart serwera po zakończeniu instalacji. NIE \`minecraft restart\`.";
+        echo "UWAGA! Definicje Kompozytora różnią się między wersjami!";
+        echo "Aby poprawnie zaaplikować update, zrób \`minecraft start\` (nie restart).";
         echo "JEŚLI ROZUMIESZ - NACIŚNIJ DOWOLNY PRZYCISK ABY KONTYNUOWAĆ!";
         read -r -n 1 -s;
         cp --verbose "./update/docker-compose.yml" "$(pwd)/docker-compose.yml";
