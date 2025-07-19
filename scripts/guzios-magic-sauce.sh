@@ -42,6 +42,8 @@ fi
 
 if [ -z "$FISH_PATH" ]; then
     FISH_PATH=$DEFAULT_FISH_PATH
+else
+    echo "Changed Fish path: $FISH_PATH"
 fi
 
 # Common strings:
