@@ -62,8 +62,8 @@ SCRIPT_PATH="$(pwd)/scripts/guzios-magic-sauce.sh"
 
 if [ -z "$1" ]; then
     echo "$STOPPED_NOTE";
-    docker logs ghostland-minecraft-1;
-    docker attach --detach-keys="ctrl-a,ctrl-d" ghostland-minecraft-1;
+    docker compose logs "minecraft";
+    docker compose attach --detach-keys="ctrl-a,ctrl-d" "minecraft";
     exit 0;
 fi
 
@@ -110,23 +110,23 @@ fi
 if [ "$1" = "send" ]; then
     if [ -z "$2" ]; then
         echo "$STOPPED_NOTE";
-        docker exec -i "ghostland-minecraft-1" "rcon-cli";
+        docker compose exec "minecraft" "rcon-cli";
         exit 0;
     fi
     echo "Attempting to execute: \`/$2\`";
     echo "$STOPPED_NOTE";
-    docker exec "ghostland-minecraft-1" "rcon-cli" "$2";
+    docker compose exec "minecraft" "rcon-cli" "$2";
     exit 0;
 fi
 
 if [ "$1" = "health" ]; then
-    docker container inspect -f "{{.State.Health.Status}}" "ghostland-minecraft-1";
+    docker container inspect -f "{{.State.Health.Status}}" "ghostland-minecraft-1"; # Compose has no "inspect" command, so we're using Docker's one - which means we need to use the full container name, not the service name. Unless it's the same deal as "attach", ie. command exist, but isn't documented.
     exit;
 fi
 
 if [ "$1" = "restart" ]; then
     echo "Stopping the server via the \`/stop\` command:";
-    $SCRIPT_PATH send stop;
+    $SCRIPT_PATH send "stop";
     echo "Command sent. If it was succesful - the server will now stop.";
     echo "Afterwards, Docker's auto-restart mechanism should kick in.";
     exit 0;
