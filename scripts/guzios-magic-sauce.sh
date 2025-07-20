@@ -335,7 +335,7 @@ if [ "$1" = "install" ]; then
     echo;
     echo "Dodaj wszystkich ważnych adminów do grupy \`docker\`. W ten sposób, będą oni mogli:";
     echo "  - Dowolnie interaktować z workdirem - chodź czasem będzie to wymagało zrobienia \`sudo minecraft fixown\`"
-    echo "    lub \`sudo minecraft scriptown\` (don't worry, to nie psuje permisji serwera - tylko pamiętaj o \`sudo minecraft fixown\`).";
+    echo "    (don't worry, to nie psuje permisji serwera - tylko zrób \`sudo minecraft fixown\`, jeśli TWORZYSZ pliki/foldery).";
     echo "  - Wykonywać część komend (np. startować serwer) jako \`minecraft [komenda]\`, a nie \`sudo minecraft [komenda]\` - sprawdź \`minecraft help\` po listę.";
     echo "  - Widzieć auto-completion \`minecraft\` i \`sudo minecraft\`.";
     echo "Zrobisz to za pomocą \`sudo minecraft allow <NAZWA_UŻYTKOWNIKA>\`."
