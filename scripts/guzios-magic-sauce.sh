@@ -132,6 +132,22 @@ if [ "$1" = "restart" ]; then
     exit 0;
 fi
 
+if [ "$1" = "stopall" ]; then
+    echo "Everything powering down. If you want to spectate any stopping logs, run \`minecraft inspect <service>\` from a different terminal.";
+    rm "minecraft.lock";
+    docker compose down;
+    exit;
+fi
+
+if [ "$1" = "inspect" ]; then
+    if [ -z "$2" ]; then
+        echo "Please specify a service name!";
+        exit 1;
+    fi
+    docker compose logs "$2";
+    exit;
+fi
+
 
 
  #  === WORKDIR MANAGEMENT ===
@@ -515,18 +531,6 @@ if [ "$1" = "allow" ]; then
     exit;
 fi
 
-if [ "$1" = "stopall" ]; then
-    if [ "$EUID" -ne 0 ]; then
-        echo "$SUDO_NOTE";
-        exit 1;
-    fi
-    
-    echo "Everything powering down. If you want to spectate Minecraft's logs as it stops, run \`minecraft\` from a different terminal.";
-    rm "minecraft.lock";
-    docker compose down;
-    exit;
-fi
-
 
 
  #  === MISC. ===
@@ -556,6 +560,11 @@ if [ "$1" = "help" ]; then
     echo "     \ Wykonuje healthcheck serwera w przyjaznej dla automatyzacji formie."
     echo "  - restart"
     echo "     \ Restartuje serwer. Jeśli chcesz monitorować status restartowania, wpisz \`minecraft\` z osobnej sesji SSH."
+    echo "  - stopall"
+    echo "     \ Zatrzymuje WSZYSTKO. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft\` z osobnej sesji SSH."
+    echo "       UWAGA: WSZYSTKO = każdy serwis w Compose. Używać tylko w awaryjnch przypadkach lub przy wyłączaniu maszyny!"
+    echo "  - inspect <serwis>"
+    echo "     \ Wyświetla logi dowolnego serwisu, np. ci lub backuper. (Lub minecraft, ale to można zrobić uruchamiając skrypt bez parametru.)"
     echo;
     echo " ---ZARZĄDZANIE FOLDEREM---";
     echo "  - workdir"
@@ -590,9 +599,6 @@ if [ "$1" = "help" ]; then
     echo "     \ Uruchamia daemon Dockera. Powinno wrzucić go również do autostartu, ale to nie zawsze działa."
     echo "  - allow <NAZWA_UŻYTKOWNIKA>"
     echo "     \ Dodaje wybranego użytkownika do grupy \`docker\`."
-    echo "  - stopall"
-    echo "     \ Zatrzymuje WSZYSTKO. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft\` z osobnej sesji SSH."
-    echo "       UWAGA: WSZYSTKO = każdy serwis w Compose. Używać tylko w awaryjnch przypadkach lub przy wyłączaniu maszyny!"
     echo;
     echo " ---RÓŻNE---";
     echo "  - test"
