@@ -384,7 +384,7 @@ if [ "$1" = "update" ]; then
     fi
 
     echo;
-    echo " ---STEP 2/6: UNINSTALLING+DELETEING THE OLDER SCRIPT---";
+    echo " ---STEP 2/6: UNINSTALLING THE OLDER SCRIPT AND DELETEING OLDER FILES---";
     
     $SCRIPT_PATH uninstall;
     if [ $? -ne 0 ]; then
@@ -421,9 +421,32 @@ if [ "$1" = "update" ]; then
         fi
         exit 1;
     fi
+    
+    chmod --verbose --recursive 777 "./web";
+    if [ $? -ne 0 ]; then
+        echo "Couldn't configure web permissions ahead of overwrite! See above for errors.";
+        echo "We won't halt the update at this stage becasue the ./scripts directory is alread gone.";
+        echo "Let's pray that this error won't cause a cascadning failure down the line.";
+    fi
+    
+    rm -rdfv "./web/public";
+    if [ $? -ne 0 ]; then
+        echo "Couldn't delete public web contents ahead of overwrite! See above for errors.";
+        echo "We won't halt the update at this stage becasue the ./scripts directory is alread gone.";
+        echo "Let's pray that this error won't cause a cascadning failure down the line.";
+    fi
+    
+    rm -fv "./web/etc-caddy/Caddyfile";
+    if [ $? -ne 0 ]; then
+        echo "Couldn't delete the Caddyfile ahead of overwrite! See above for errors.";
+        echo "We won't halt the update at this stage becasue the ./scripts directory is alread gone.";
+        echo "Let's pray that this error won't cause a cascadning failure down the line.";
+    fi
 
     echo;
     echo " ---STEP 3/6: COPYING---";
+    cp --verbose --force --update=all "./update/web/etc-caddy/Caddyfile" "./web/etc-caddy/";
+    cp --verbose --recursive --force --update=all "./update/web/public" "./web/";
     cp --verbose --recursive "./update/scripts" "$(pwd)";
     cp "./update/docker-compose.yml" "./update/docker-compose-test.yml";
     GROUPID=$(cat /etc/group | grep docker | cut -d: -f3)

@@ -69,3 +69,17 @@ services:
     environment:
       REPO: https://github.com/Team-GhostLand/GhostLand7.git
       NAME: GhostLand
+  
+  web:
+    image: caddy:alpine
+    restart: unless-stopped
+    ports:
+      # Will sort this mess out after taking with Jifo
+      - "80:25575"
+      #- "443:443"
+      #- "443:443/udp"
+    volumes:
+      - ./web/etc-caddy:/etc/caddy
+      - ./web/public:/usr/share/caddy
+      - ./web/caddy-data:/data
+      - ./web/caddy-config:/config

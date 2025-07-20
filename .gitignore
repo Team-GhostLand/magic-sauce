@@ -1,3 +1,5 @@
 /minecraft
 /backups
 /builds
+/web/caddy-config
+/web/caddy-data
