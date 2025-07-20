@@ -144,7 +144,7 @@ if [ "$1" = "inspect" ]; then
         echo "Please specify a service name!";
         exit 1;
     fi
-    docker compose logs -f "$2";
+    docker compose logs "$2";
     exit;
 fi
 
