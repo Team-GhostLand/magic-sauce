@@ -33,9 +33,6 @@ services:
       GID: "%DOCKER_GROUP_ID%"
       TZ: "Europe/Warsaw"
       LOG_TIMESTAMP: "true"
-    configs:
-      - source: "modpack"
-        target: "/modpack.mrpack"
   
   #backuper:
     #image: itzg/mc-backup
