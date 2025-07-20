@@ -33,6 +33,9 @@ services:
       GID: "%DOCKER_GROUP_ID%"
       TZ: "Europe/Warsaw"
       LOG_TIMESTAMP: "true"
+    depends_on:
+      ci:
+        condition: service_healthy
   
   #backuper:
     #image: itzg/mc-backup
