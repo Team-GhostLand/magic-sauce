@@ -556,7 +556,7 @@ if [ "$1" = "allow" ]; then
 fi
 
 if [ "$1" = "cleanup" ]; then
-    docker rmi "minecraft-ci";
+    docker rmi "ghostland-ci";
     exit;
 fi
 
