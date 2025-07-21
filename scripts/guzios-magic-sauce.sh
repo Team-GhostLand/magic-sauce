@@ -555,6 +555,11 @@ if [ "$1" = "allow" ]; then
     exit;
 fi
 
+if [ "$1" = "cleanup" ]; then
+    docker rmi "minecraft-ci";
+    exit;
+fi
+
 
 
  #  === MISC. ===
@@ -623,6 +628,8 @@ if [ "$1" = "help" ]; then
     echo "     \ Uruchamia daemon Dockera. Powinno wrzucić go również do autostartu, ale to nie zawsze działa."
     echo "  - allow <NAZWA_UŻYTKOWNIKA>"
     echo "     \ Dodaje wybranego użytkownika do grupy \`docker\`."
+    echo "  - cleanup"
+    echo "     \ Cleans up all images built by this compose file. Does NOT need sudo, unlike all other commands in this section."
     echo;
     echo " ---RÓŻNE---";
     echo "  - test"
