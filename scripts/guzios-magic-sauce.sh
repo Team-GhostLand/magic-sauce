@@ -445,8 +445,8 @@ if [ "$1" = "update" ]; then
 
     echo;
     echo " ---STEP 3/6: COPYING---";
-    cp --verbose --force --update=all "./update/web/etc-caddy/Caddyfile" "./web/etc-caddy/";
-    cp --verbose --recursive --force --update=all "./update/web/public" "./web/";
+    cp --verbose --force "./update/web/etc-caddy/Caddyfile" "./web/etc-caddy/";
+    cp --verbose --recursive --force "./update/web/public" "./web/";
     cp --verbose --recursive "./update/scripts" "$(pwd)";
     cp "./update/docker-compose.yml" "./update/docker-compose-test.yml";
     GROUPID=$(cat /etc/group | grep docker | cut -d: -f3)
