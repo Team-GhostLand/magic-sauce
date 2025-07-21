@@ -324,7 +324,7 @@ if [ "$1" = "install" ]; then
     sleep 3;
     echo;
     echo " ---STEP 7/7: FISH---";
-    SUBCOMMANDS="start stop stopall send health restart inspect workdir fixown mark-stopped install uninstall update reinstall startd allow test help"
+    SUBCOMMANDS="start stop stopall send health restart inspect workdir fixown mark-stopped install uninstall update reinstall startd allow cleanup test help"
     COMPLETIONS="complete -c minecraft -a '$SUBCOMMANDS'"
     echo "Zapisywanie \`$COMPLETIONS\` do \`$FISH_PATH\`.";
     echo "$COMPLETIONS" > "$FISH_PATH";
