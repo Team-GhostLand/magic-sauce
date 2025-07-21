@@ -33,6 +33,7 @@ services:
       GID: "%DOCKER_GROUP_ID%"
       TZ: "Europe/Warsaw"
       LOG_TIMESTAMP: "true"
+      MODRINTH_FORCE_SYNCHRONIZE: "true"
     depends_on:
       ci:
         condition: service_healthy
