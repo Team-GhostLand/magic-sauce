@@ -75,7 +75,7 @@ services:
     restart: unless-stopped
     ports:
       # Will sort this mess out after taking with Jifo
-      - "80:25575"
+      - "25575:80"
       #- "443:443"
       #- "443:443/udp"
     volumes:
