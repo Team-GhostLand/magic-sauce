@@ -445,6 +445,7 @@ if [ "$1" = "update" ]; then
 
     echo;
     echo " ---STEP 3/6: COPYING---";
+    mkdir -p "./web/etc-caddy/"
     cp --verbose --force "./update/web/etc-caddy/Caddyfile" "./web/etc-caddy/";
     cp --verbose --recursive --force "./update/web/public" "./web/";
     cp --verbose --recursive "./update/scripts" "$(pwd)";
