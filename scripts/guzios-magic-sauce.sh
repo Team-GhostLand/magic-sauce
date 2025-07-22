@@ -429,7 +429,7 @@ if [ "$1" = "update" ]; then
         echo "Let's pray that this error won't cause a cascadning failure down the line.";
     fi
     
-    rm -rdfv "./web/public";
+    rm -rdfv "./web/public/*";
     if [ $? -ne 0 ]; then
         echo "Couldn't delete public web contents ahead of overwrite! See above for errors.";
         echo "We won't halt the update at this stage becasue the ./scripts directory is alread gone.";
