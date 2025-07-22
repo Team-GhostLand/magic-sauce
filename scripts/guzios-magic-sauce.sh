@@ -123,12 +123,12 @@ if [ "$1" = "send" ]; then
     if [ -z "$2" ]; then
         echo "$STOPPED_NOTE";
         docker compose exec "minecraft" "rcon-cli";
-        exit 0;
+        exit;
     fi
     echo "Attempting to execute: \`/$2\`";
     echo "$STOPPED_NOTE";
     docker compose exec "minecraft" "rcon-cli" "$2";
-    exit 0;
+    exit;
 fi
 
 if [ "$1" = "health" ]; then
@@ -138,10 +138,9 @@ fi
 
 if [ "$1" = "restart" ]; then
     echo "Stopping the server via the \`/stop\` command:";
+    echo "(Afterwards, Docker's auto-restart mechanism should kick in.)";
     $SCRIPT_PATH send "stop";
-    echo "Command sent. If it was succesful - the server will now stop.";
-    echo "Afterwards, Docker's auto-restart mechanism should kick in.";
-    exit 0;
+    exit;
 fi
 
 if [ "$1" = "kill" ]; then
