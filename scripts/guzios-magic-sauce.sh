@@ -156,7 +156,7 @@ if [ "$1" = "kill" ]; then
         docker compose down;
         exit;
     fi
-    echo "Service $2 server powering down...";
+    echo "Service $2 powering down...";
     docker compose down "$2";
     exit;
 fi
