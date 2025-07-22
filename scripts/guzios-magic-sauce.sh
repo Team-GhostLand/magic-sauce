@@ -50,6 +50,7 @@ SUDO_NOTE="ERROR: This script must be ran as root!"
 INSTALL_PATH="%INSTALL_PATH%"
 INSTALL_PATH_LITERAL=$'\x25\x49\x4e\x53\x54\x41\x4c\x4c\x5f\x50\x41\x54\x48\x25'
 SCRIPT_PATH="$(pwd)/scripts/guzios-magic-sauce.sh"
+FISH_SUBCOMMANDS="start stop send health restart kill inspect sh workdir fixown mark-stopped install uninstall update reinstall startd allow cleanup test help"
 
 
 
@@ -62,7 +63,7 @@ SCRIPT_PATH="$(pwd)/scripts/guzios-magic-sauce.sh"
 
 if [ -z "$1" ]; then
     echo "$STOPPED_NOTE";
-    docker compose logs "minecraft";
+    docker compose logs -n 4096 "minecraft";
     docker compose attach --detach-keys="ctrl-a,ctrl-d" "minecraft";
     exit 0;
 fi
@@ -101,9 +102,20 @@ if [ "$1" = "start" ]; then
 fi
 
 if [ "$1" = "stop" ]; then
-    echo "Minecraft server powering down. If you want to spectate its logs as it stops, run \`minecraft\` from a different terminal.";
-    rm "minecraft.lock";
-    docker compose stop "minecraft";
+    if [ -z "$2" ]; then
+        echo "Minecraft server powering down. If you want to spectate its logs as it stops, run \`minecraft\` from a different terminal.";
+        rm "minecraft.lock";
+        docker compose stop "minecraft";
+        exit;
+    fi
+    if [ "$2" == "ALL" ]; then
+        echo "EVERYTHING powering down! If you want to spectate any stopping logs, run \`minecraft inspect <service>\` (or just \`minecraft\` for the Minecraft Server) from a different terminal.";
+        rm "minecraft.lock";
+        docker compose stop;
+        exit;
+    fi
+    echo "Service $2 server powering down...";
+    docker compose stop "$2";
     exit;
 fi
 
@@ -132,10 +144,21 @@ if [ "$1" = "restart" ]; then
     exit 0;
 fi
 
-if [ "$1" = "stopall" ]; then
-    echo "Everything powering down. If you want to spectate any stopping logs, run \`minecraft inspect <service>\` from a different terminal.";
-    rm "minecraft.lock";
-    docker compose down;
+if [ "$1" = "kill" ]; then
+    if [ -z "$2" ]; then
+        echo "Minecraft server powering down. If you want to spectate its logs as it stops, run \`minecraft\` from a different terminal.";
+        rm "minecraft.lock";
+        docker compose down "minecraft";
+        exit;
+    fi
+    if [ "$2" == "ALL" ]; then
+        echo "EVERYTHING powering down! If you want to spectate any stopping logs, run \`minecraft inspect <service>\` (or just \`minecraft\` for the Minecraft Server) from a different terminal.";
+        rm "minecraft.lock";
+        docker compose down;
+        exit;
+    fi
+    echo "Service $2 server powering down...";
+    docker compose down "$2";
     exit;
 fi
 
@@ -144,7 +167,16 @@ if [ "$1" = "inspect" ]; then
         echo "Please specify a service name!";
         exit 1;
     fi
-    docker compose logs "$2";
+    docker compose logs -n 4096 "$2";
+    exit;
+fi
+
+if [ "$1" = "sh" ]; then
+    if [ -z "$2" ]; then
+        echo "Please specify service name!";
+        exit 1;
+    fi
+    docker compose exec "$2" "sh";
     exit;
 fi
 
@@ -324,8 +356,7 @@ if [ "$1" = "install" ]; then
     sleep 3;
     echo;
     echo " ---STEP 7/7: FISH---";
-    SUBCOMMANDS="start stop stopall send health restart inspect workdir fixown mark-stopped install uninstall update reinstall startd allow cleanup test help"
-    COMPLETIONS="complete -c minecraft -a '$SUBCOMMANDS'"
+    COMPLETIONS="complete -c minecraft -a '$FISH_SUBCOMMANDS'"
     echo "Zapisywanie \`$COMPLETIONS\` do \`$FISH_PATH\`.";
     echo "$COMPLETIONS" > "$FISH_PATH";
     chmod --verbose 555 "$FISH_PATH";
@@ -576,7 +607,12 @@ if [ "$1" = "help" ]; then
     echo "     \ TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO (*works, but no docs)"
     echo "  - stop"
     echo "     \ Zatrzymuje serwer MC. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft\` z osobnej sesji SSH."
-    echo "       UWAGA: Komendy stop i stopall to JEDYNY sposób na zatrzymanie serwera MC - użycie \`/stop\` w MC ztriggeruje auto-restart."
+    echo "       UWAGA: Komendy stop i kill to JEDYNY sposób na zatrzymanie serwera MC - użycie \`/stop\` w MC ztriggeruje auto-restart."
+    echo "  - stop ALL"
+    echo "     \ Zatrzymuje WSZYSTKO. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft\` z osobnej sesji SSH."
+    echo "       UWAGA: WSZYSTKO = każdy serwis w Compose. Używać tylko w awaryjnch przypadkach lub przy wyłączaniu maszyny!"
+    echo "  - stop <serwis>"
+    echo "     \ Zatrzymuje dany serwis. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft inspect <serwis>\` z osobnej sesji SSH."
     echo "  - send"
     echo "     \ Otwiera interaktywne menu RCON."
     echo "       UWAGA: Podobnie, jak w konsoli MC - nie pisz slasha na początku!"
@@ -589,11 +625,12 @@ if [ "$1" = "help" ]; then
     echo "     \ Wykonuje healthcheck serwera w przyjaznej dla automatyzacji formie."
     echo "  - restart"
     echo "     \ Restartuje serwer. Jeśli chcesz monitorować status restartowania, wpisz \`minecraft\` z osobnej sesji SSH."
-    echo "  - stopall"
-    echo "     \ Zatrzymuje WSZYSTKO. Jeśli chcesz monitorować status zatrzymywania, wpisz \`minecraft\` z osobnej sesji SSH."
-    echo "       UWAGA: WSZYSTKO = każdy serwis w Compose. Używać tylko w awaryjnch przypadkach lub przy wyłączaniu maszyny!"
+    echo "  - kill [opcjonalny parametr, jak w \`stop\`]"
+    echo "     \ Jak \`stop\`, ale dodatkowo usuwa kontener(y). To NIE ZNACZY, że usunięte zostaną jakiekolwiek dane - te zapisywane są poza kontenerem."
     echo "  - inspect <serwis>"
     echo "     \ Wyświetla logi dowolnego serwisu, np. ci lub backuper. (Lub minecraft, ale to można zrobić uruchamiając skrypt bez parametru.)"
+    echo "  - sh <serwis>"
+    echo "     \ Otwiera shella w danym serwisie."
     echo;
     echo " ---ZARZĄDZANIE FOLDEREM---";
     echo "  - workdir"
