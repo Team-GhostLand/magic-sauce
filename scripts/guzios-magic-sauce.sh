@@ -35,22 +35,16 @@ DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
 
 cd "$DIR/../" || exit;
 
-STOPPED_NOTE="NOTE: The server seems to be offline. If this command fails, run \`minecraft start\` and try again."
-if [ -e "minecraft.lock" ]; then
-    STOPPED_NOTE=""
-fi
-
 if [ -z "$FISH_PATH" ]; then
     FISH_PATH=$DEFAULT_FISH_PATH
 fi
 
 # Common strings:
-WORKDIR_NOTE="[[Working from: $(pwd)]]"
 SUDO_NOTE="ERROR: This script must be ran as root!"
 INSTALL_PATH="%INSTALL_PATH%"
 INSTALL_PATH_LITERAL=$'\x25\x49\x4e\x53\x54\x41\x4c\x4c\x5f\x50\x41\x54\x48\x25'
 SCRIPT_PATH="$(pwd)/scripts/guzios-magic-sauce.sh"
-FISH_SUBCOMMANDS="start stop send health restart kill inspect sh workdir fixown mark-stopped install uninstall update reinstall startd allow cleanup test help"
+FISH_SUBCOMMANDS="start stop send health restart kill inspect sh workdir cd fixown install uninstall update reinstall startd allow cleanup test help"
 
 
 
@@ -62,55 +56,25 @@ FISH_SUBCOMMANDS="start stop send health restart kill inspect sh workdir fixown 
  #  === SERVER MANAGEMENT ===
 
 if [ -z "$1" ]; then
-    echo "$STOPPED_NOTE";
     docker compose logs -n 4096 "minecraft";
     docker compose attach --detach-keys="ctrl-a,ctrl-d" "minecraft";
     exit 0;
 fi
 
 if [ "$1" = "start" ]; then
-    echo "$WORKDIR_NOTE";
-    echo;
-
-    if [ -e "minecraft.lock" ]; then
-        echo "NOTE: The server is already starting/running.";
-        echo;
-        echo "This isn't a problem - the command does nothing in such a case.";
-        echo "...Unless docker-compose.yml changed - then we'll reboot only";
-        echo "those containers that had something changed about them.";
-        echo "Please watch the logs below to see exaclty what happens.";
-        echo;
-        echo "(note that if it's the Minecraft server that ends up restarting, you'll";
-        echo "have to run \`minecraft\` from a different terminal to see the logs)";
-        echo;
-    else
-        touch "minecraft.lock";
-        echo "Server powering up. If you want to spectate the logs as it starts, run \`minecraft\` from a different terminal.";
-        echo;
-    fi
-    
+    echo "Server powering up. If you want to spectate the logs as it starts, run \`minecraft\` from a different terminal.";
     docker compose up -d;
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Docker threw an exception. If it was something about not being able to open a socket, then:";
-        echo "  - Make sure you are a member of the \`docker\` group. You can add users to it using \`sudo minecraft allow <USERNAME>\`.";
-        echo "  - Make sure that the Docker Daemon is running. You can check it and start it automatically using \`sudo minecraft startd\`.";
-        echo "  - Go cry in a corner, in case the above solutions fail - most likely, Docker is borked somehow.";
-        rm "minecraft.lock";
-        exit 1;
-    fi
-    exit 0;
+    exit;
 fi
 
 if [ "$1" = "stop" ]; then
     if [ -z "$2" ]; then
         echo "Minecraft server powering down. If you want to spectate its logs as it stops, run \`minecraft\` from a different terminal.";
-        rm "minecraft.lock";
         docker compose stop "minecraft";
         exit;
     fi
     if [ "$2" == "ALL" ]; then
         echo "EVERYTHING powering down! If you want to spectate any stopping logs, run \`minecraft inspect <service>\` (or just \`minecraft\` for the Minecraft Server) from a different terminal.";
-        rm "minecraft.lock";
         docker compose stop;
         exit;
     fi
@@ -120,13 +84,12 @@ if [ "$1" = "stop" ]; then
 fi
 
 if [ "$1" = "send" ]; then
+    $SCRIPT_PATH start;
     if [ -z "$2" ]; then
-        echo "$STOPPED_NOTE";
         docker compose exec "minecraft" "rcon-cli";
         exit;
     fi
     echo "Attempting to execute: \`/$2\`";
-    echo "$STOPPED_NOTE";
     docker compose exec "minecraft" "rcon-cli" "$2";
     exit;
 fi
@@ -146,13 +109,11 @@ fi
 if [ "$1" = "kill" ]; then
     if [ -z "$2" ]; then
         echo "Minecraft server powering down. If you want to spectate its logs as it stops, run \`minecraft\` from a different terminal.";
-        rm "minecraft.lock";
         docker compose down "minecraft";
         exit;
     fi
     if [ "$2" == "ALL" ]; then
         echo "EVERYTHING powering down! If you want to spectate any stopping logs, run \`minecraft inspect <service>\` (or just \`minecraft\` for the Minecraft Server) from a different terminal.";
-        rm "minecraft.lock";
         docker compose down;
         exit;
     fi
@@ -188,14 +149,17 @@ if [ "$1" = "workdir" ]; then
     exit;
 fi
 
+if [ "$1" = "cd" ]; then
+    echo "cd $(pwd)";
+    exit;
+fi
+
 if [ "$1" = "fixown" ]; then
     if [ "$EUID" -ne 0 ]; then
         echo "$SUDO_NOTE";
         exit 1;
     fi
-
-    echo "$WORKDIR_NOTE";
-    echo;
+    
     # Why am I giving read+write+exec perms to things that SHOULD only need read+write perms? Because folders in Linux need execute permissions to be writable. Stupid? Yes! But what can we do about it?
     chmod --verbose --recursive 770 .;
     chmod --verbose 070 .;
@@ -210,11 +174,6 @@ if [ "$1" = "fixown" ]; then
     echo "causes problems. Also, for security reasons, you cannot edit scripts or compose. To change anything,";
     echo "please edit them on GitHub and run \`sudo minecraft update\`. In DIRE situations, edit them as root.";
     exit 0;
-fi
-
-if [ "$1" = "mark-stopped" ]; then
-    rm --verbose "minecraft.lock";
-    exit;
 fi
 
 
@@ -634,6 +593,9 @@ if [ "$1" = "help" ]; then
     echo " ---ZARZĄDZANIE FOLDEREM---";
     echo "  - workdir"
     echo "     \ Pokazuje folder, z poziomu którego operuje ten skrypt."
+    echo "  - cd"
+    echo "     \ Należy wykonać jako \`\$(minecraft cd)\` - wtedy przeniesie cię do folderu głównego GhostLanda."
+    echo "       Można zrobić \`\$(minecraft cd)/minecraft/<...>\` - wtedy przeniesie cię do folderu danej edycji."
     echo "  - fixown"
     echo "     \ Serwer lubi czasem zabrać innym permisje do swojego folderu. Ta pod-komenda ustawia permisje w taki sposób, że:"
     echo "       a) Członkowie grupy \`docker\` mogą bez problemu interaktować z workdirem (nie licząc edycji skryptów i compose)."
@@ -642,8 +604,6 @@ if [ "$1" = "help" ]; then
     echo "       Fixown dodatkowo ustawia ownership na $PHANTOM_USER:docker, na wypadek gdyby permisje popsuły się „odwrotnie” (dla serwera).";
     echo "       UWAGA: Rób to ZAWSZE, gdy DODAJESZ pliki!!!!!!!!"
     echo "       [Tę komendę należy wykonać jako root, nawet jeśli jest się w grupie \`docker\`!]"
-    echo "  - mark-stopped"
-    echo "     \ Usuwa lockfile. Wpływa to jedynie na wiadomości tekstowe, więc RACZEJ powinno być bezpieczne (nawet, jeśli serwer tak na prawdę nie jest wyłączony)."
     echo;
     echo " ---ZARZĄDZANIE SKRYPTEM---";
     echo "  [UWAGA: Wszystkie pod-komendy należy wykonać jako root, nawet jeśli jest się w grupie \`docker\`!]"
