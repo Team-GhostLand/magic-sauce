@@ -11,13 +11,15 @@
 :80 {
 	# Set this path to your site's directory.
 	root * /usr/share/caddy
-	root /modules/* /srv
 
 	# Compression
 	encode
 
 	# Enable the static file server.
 	file_server browse
+	file_server /modules/* {
+		root /srv
+	}
 
 	# Another common task is to set up a reverse proxy:
 	reverse_proxy /modules/railwaymap/* minecraft:3876
