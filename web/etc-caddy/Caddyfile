@@ -17,7 +17,7 @@
 
 	# Enable the static file server.
 	file_server browse
-	file_server /modules/* {
+	file_server /modules/* browse {
 		root /srv
 	}
 
