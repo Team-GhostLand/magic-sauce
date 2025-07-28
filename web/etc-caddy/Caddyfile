@@ -16,12 +16,20 @@
 		file_server browse
 		
 		reverse_proxy /railwaymap/* minecraft:3876
+		
+		handle_errors 404 {
+			respond "404 on modules handler" 404
+		}
 	}
 	
 	handle {
 		root * /usr/share/caddy
 		encode
 		file_server browse
+		
+		handle_errors 404 {
+			respond "404 on main handler" 404
+		}
 	}
 }
 
