@@ -12,14 +12,14 @@
 	# Set this path to your site's directory.
 	root * /usr/share/caddy
 
+	# Compression
+	encode
+
 	# Enable the static file server.
-	file_server
+	file_server browse
 
 	# Another common task is to set up a reverse proxy:
-	# reverse_proxy localhost:8080
-
-	# Or serve a PHP site through php-fpm:
-	# php_fastcgi localhost:9000
+	reverse_proxy /modules/railwaymap minecraft:3876
 }
 
 # Refer to the Caddy docs for more information:
