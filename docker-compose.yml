@@ -83,6 +83,6 @@ services:
     volumes:
       - ./web/etc-caddy:/etc/caddy
       - ./web/public:/usr/share/caddy
-      - ./builds:/usr/share/caddy/cdn/ci
+      - ./builds:/srv/ci
       - ./web/caddy-data:/data
       - ./web/caddy-config:/config

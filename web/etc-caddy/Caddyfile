@@ -11,6 +11,7 @@
 :80 {
 	# Set this path to your site's directory.
 	root * /usr/share/caddy
+	root /modules/* /srv
 
 	# Compression
 	encode
