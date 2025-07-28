@@ -9,6 +9,9 @@
 # domain name.
 
 :80 {
+	file_server /modules/* browse {
+		root /srv
+	}
 	# Set this path to your site's directory.
 	root * /usr/share/caddy
 
@@ -17,9 +20,6 @@
 
 	# Enable the static file server.
 	file_server browse
-	file_server /modules/* browse {
-		root /srv
-	}
 
 	# Another common task is to set up a reverse proxy:
 	reverse_proxy /modules/railwaymap/* minecraft:3876
