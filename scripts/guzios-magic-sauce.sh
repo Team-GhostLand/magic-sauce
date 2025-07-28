@@ -478,7 +478,7 @@ if [ "$1" = "update" ]; then
         echo "  - Wykonaj komendę \`sudo $SCRIPT_PATH install\`";
         exit 1;
     fi
-    echo "Operacja SED zakończona. Zamieniono %INSTALL_PATH% na $INSTALL_PATH, bądź już było zamienione.";
+    echo "Operacja SED zakończona. Zamieniono $INSTALL_PATH_LITERAL na $INSTALL_PATH, bądź już było zamienione.";
 
     echo;
     echo " ---STEP 6/6: INSTALLING THE NEWER SCRIPT---";
