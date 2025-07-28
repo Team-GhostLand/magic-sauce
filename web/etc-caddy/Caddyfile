@@ -16,6 +16,8 @@
 		file_server browse
 		
 		reverse_proxy /railwaymap/* minecraft:3876
+		
+		redir / / permanent # Looks very stupid, but basically - becasue prefixes are stripped - the first / means „modules/”, while the second is just "/"; the index.thml
 	}
 	
 	handle {
