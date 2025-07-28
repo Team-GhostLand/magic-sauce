@@ -21,9 +21,9 @@
 	handle {
 		root * /usr/share/caddy
 		encode
-		file_server browse
+		file_server
 	}
 }
 
 # Refer to the Caddy docs for more information:
-# https://caddyserver.com/docs/caddyfile
+# https://caddyserver.com/docs/caddyfilex
