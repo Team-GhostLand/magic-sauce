@@ -6,6 +6,7 @@ services:
     image: "itzg/minecraft-server:java21-graalvm"
     tty: true
     stdin_open: true
+    network_mode: "host"
     ports:
       - "25565:25565"
       - "3876:3876"
@@ -59,6 +60,7 @@ services:
   
   ci:
     build: "https://github.com/Team-GhostLand/Grinch.git"
+    network_mode: "host"
     volumes:
       - "./builds:/exports"
     restart: on-failure:5
@@ -75,6 +77,7 @@ services:
   web:
     image: caddy:alpine
     restart: unless-stopped
+    network_mode: "host"
     ports:
       # Will sort this mess out after taking with Jifo
       - "25575:80"
