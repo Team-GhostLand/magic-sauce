@@ -8,14 +8,14 @@
 # this machine's public IP, then replace ":80" below with your
 # domain name.
 
-:80 {
+:25575 { # TODO: Ask Jifo to port-forward 80 (http 1+2), 443 (https 1+2), 80/udp (http 3) and 443/udp (https 3) - and switch to them, instead of RCON's 25575
 	
 	handle_path /modules/* {
 		root * /srv
 		encode
 		file_server browse
 		
-		reverse_proxy /railwaymap/* minecraft:3876
+		reverse_proxy /railwaymap/* localhost:3876
 		
 		redir / / permanent # Looks very stupid, but basically - becasue prefixes are stripped - the first / means „modules/”, while the second is just "/"; the index.thml
 	}

@@ -7,9 +7,6 @@ services:
     tty: true
     stdin_open: true
     network_mode: "host"
-    ports:
-      - "25565:25565"
-      - "3876:3876"
     volumes:
       - "./minecraft/gl7:/data"
       - "./builds:/modpacks:ro"
@@ -78,11 +75,6 @@ services:
     image: caddy:alpine
     restart: unless-stopped
     network_mode: "host"
-    ports:
-      # Will sort this mess out after taking with Jifo
-      - "25575:80"
-      #- "443:443"
-      #- "443:443/udp"
     volumes:
       - ./web/etc-caddy:/etc/caddy
       - ./web/public:/usr/share/caddy
