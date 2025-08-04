@@ -22,6 +22,7 @@ services:
       TYPE: "MODRINTH"
       MODRINTH_MODPACK: "/modpacks/latest_server.mrpack"
       # Minecraft stuff
+      RCON_PORT: "25573" #Temproary, until we move the webserver onto a correct port (that won't conflict with RCON)
       GUI: "FALSE"
       EULA: "TRUE"              #  Why are some bools upper-case...
       # Java stuff
