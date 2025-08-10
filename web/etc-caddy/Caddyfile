@@ -11,19 +11,20 @@
 :25575 { # TODO: Ask Jifo to port-forward 80 (http 1+2), 443 (https 1+2), 80/udp (http 3) and 443/udp (https 3) - and switch to them, instead of RCON's 25575
 	
 	handle_path /modules/* {
+		
+		# FS-based modules (those, that get mounted in docker-cmpose.yml) [only CI right now]
 		root * /srv
 		encode
 		file_server browse
 		
+		# For modules hosted as complete web servers by different services [only Create Track Map right now]
 		reverse_proxy /railwaymap/* localhost:3876
 		
 		redir / / permanent # Looks very stupid, but basically - becasue prefixes are stripped - the first / means „modules/”, while the second is just "/"; the index.thml
 	}
 	
 	handle {
-		root * /usr/share/caddy
-		encode
-		file_server
+		reverse_proxy /* localhost:3000
 	}
 }
 

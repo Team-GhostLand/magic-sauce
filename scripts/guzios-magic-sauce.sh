@@ -546,6 +546,7 @@ fi
 
 if [ "$1" = "cleanup" ]; then
     docker rmi "ghostland-ci";
+    docker rmi "ghostland-web-custom";
     exit;
 fi
 

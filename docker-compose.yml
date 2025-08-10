@@ -61,7 +61,7 @@ services:
     network_mode: "host"
     volumes:
       - "./builds:/exports"
-    restart: on-failure:5
+    restart: unless-stopped # Used to be on-failure:5, to prevent it from failure-looping if something catastropic happens (eg. it can't connect to GitHub or the ZIP file is corrupted). But it seems that, every once in a while, it will EITHER just randomly fail (and after this happens 5 times, it will fail permanently) OR exit as „completed” (we don't yet know which it is), which usually means we have to manually restart it every 3 days or so. Until we properly debug what tf is going on - this needs to be set to unless-stopped for the Continuus Inregration to actually stay continuus.
     healthcheck:
       test: ["CMD-SHELL", "test -e /exports/latest_server.mrpack"]
       start_period: 120s # Considering how brutal the interval-retries policy is, we should give it a lot of time to start (2min ought to be enough), to be 100% sure that it won't die immidiatley upon startup.
@@ -78,7 +78,11 @@ services:
     network_mode: "host"
     volumes:
       - ./web/etc-caddy:/etc/caddy
-      - ./web/public:/usr/share/caddy
       - ./builds:/srv/ci
       - ./web/caddy-data:/data
       - ./web/caddy-config:/config
+  
+  web-custom:
+    build: "https://github.com/Team-GhostLand/GL-web.git"
+    restart: unless-stopped
+    network_mode: "host"
