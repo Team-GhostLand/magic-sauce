@@ -8,6 +8,8 @@
 # this machine's public IP, then replace ":80" below with your
 # domain name.
 
+
+
 :25575 { # TODO: Ask Jifo to port-forward 80 (http 1+2), 443 (https 1+2), 80/udp (http 3) and 443/udp (https 3) - and switch to them, instead of RCON's 25575
 	
 	handle_path /modules/* {
@@ -15,10 +17,10 @@
 		# FS-based modules (those, that get mounted in docker-compose.yml) [only CI right now]
 		root * /srv
 		encode
-		file_server {
-            hide /srv/ci/latest_server.mrpack
-            browse
+        @no_access {
+            not path *server.mrpack
         }
+		file_server @no_access browse
 		
 		# For modules hosted as complete web servers by different services [only Create Track Map right now]
 		reverse_proxy /railwaymap/* localhost:3876
