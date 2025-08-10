@@ -12,10 +12,12 @@
 	
 	handle_path /modules/* {
 		
-		# FS-based modules (those, that get mounted in docker-cmpose.yml) [only CI right now]
+		# FS-based modules (those, that get mounted in docker-compose.yml) [only CI right now]
 		root * /srv
 		encode
-		file_server browse
+		file_server browse {
+            hide /srv/ci/latest_server.mrpack 
+        }
 		
 		# For modules hosted as complete web servers by different services [only Create Track Map right now]
 		reverse_proxy /railwaymap/* localhost:3876
