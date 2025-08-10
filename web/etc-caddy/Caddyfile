@@ -22,7 +22,7 @@
         # For modules hosted as complete web servers by different services [only Create Track Map right now]
         reverse_proxy /railwaymap/* localhost:3876
         
-        redir / / permanent # Looks very stupid, but basically - becasue prefixes are stripped - the first / means „modules/”, while the second is just "/"; the index.thml
+        redir / / permanent # Looks very stupid, but basically the first / means „modules/” (becasue prefixes are stripped), while the second is just "/" or the website root - in other words: this recirects from [URL]/modules/ to [URL]/
     }
     
     handle {
