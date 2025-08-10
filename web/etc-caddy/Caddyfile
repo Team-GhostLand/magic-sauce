@@ -8,7 +8,7 @@
 # this machine's public IP, then replace ":80" below with your
 # domain name.
 
-:25575 { # TODO: Ask Jifo to port-forward 80 (http 1+2), 443 (https 1+2), 80/udp (http 3) and 443/udp (https 3) - and switch to them, instead of RCON's 25575
+ghostland.ovh:25575 { # TODO: Ask Jifo to port-forward 80 (http 1+2), 443 (https 1+2), 80/udp (http 3) and 443/udp (https 3) - and switch to them, instead of RCON's 25575
     
     handle_path /modules/* {
         
