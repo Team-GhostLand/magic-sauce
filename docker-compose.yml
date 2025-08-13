@@ -38,7 +38,7 @@ services:
       EULA: "TRUE"              #  Why are some bools upper-case...
       # Java stuff
       MEMORY: "20G"
-      USE_AIKAR_FLAGS: "true"   #  ...and others lower-? No fucking idea! I'm just following the docs, that's all.
+      USE_AIKAR_FLAGS: "true"   #  ...and others lower-case? No fucking idea! I'm just following the docs, that's all.
       # Secrets
       CFG_DB_HOST_FILE: "/run/secrets/db_host"
       CFG_DB_PORT_FILE: "/run/secrets/db_port"
