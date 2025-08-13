@@ -23,7 +23,6 @@ services:
       - db_user
       - db_password
       - db_table_accounts_ingame
-      - db_table_blocks
       - bot_poltergeist
     depends_on:
       ci:
