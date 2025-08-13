@@ -49,6 +49,11 @@ services:
       CFG_DB_PASS_FILE: "/run/secrets/db_password"
       CFG_DB_TABLE_DISABLED_FILE: "/run/secrets/db_table_blocks"
       CFG_BOT_TOKEN_FILE: "/run/secrets/bot_poltergeist"
+      # Desperatley trying to get Secrets to work
+      REPLACE_ENV_VARIABLES: "TRUE"
+      ENV_VARIABLE_PREFIX: "CFG_"
+      REPLACE_ENV_IN_PLACE: "true"
+      REPLACE_ENV_DURING_SYNC: "true"
       # Misc
       UID: "42069"
       GID: "%DOCKER_GROUP_ID%"
