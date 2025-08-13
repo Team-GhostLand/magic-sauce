@@ -48,7 +48,6 @@ services:
       CFG_DB_TABLE_FILE: "/run/secrets/db_table_accounts_ingame"
       CFG_DB_USER_FILE: "/run/secrets/db_user"
       CFG_DB_PASS_FILE: "/run/secrets/db_password"
-      CFG_DB_TABLE_DISABLED_FILE: "/run/secrets/db_table_blocks"
       CFG_BOT_TOKEN_FILE: "/run/secrets/bot_poltergeist"
       # Desperatley trying to get Secrets to work
       REPLACE_ENV_VARIABLES: "TRUE"
@@ -151,7 +150,5 @@ secrets:
       file: ./secrets/db/accounts/user_pass.txt
     db_table_accounts_ingame:
       file: ./secrets/db/tables/accounts_ingame.txt
-    db_table_blocks:
-      file: ./secrets/db/tables/blocks.txt
     bot_poltergeist:
       file: ./secrets/bot_tokens/poltergeist.txt

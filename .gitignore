@@ -1,5 +1,9 @@
+# All those folders will/should be there in a deployed (be it for prod or for testing) magic-sauce, but they contain local data, hence they should not end up on GitHub
+
 /minecraft
 /backups
 /builds
 /web/caddy-config
 /web/caddy-data
+/db
+/secrets

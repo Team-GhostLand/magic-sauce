@@ -44,7 +44,7 @@ SUDO_NOTE="ERROR: This script must be ran as root!"
 INSTALL_PATH="%INSTALL_PATH%"
 INSTALL_PATH_LITERAL=$'\x25\x49\x4e\x53\x54\x41\x4c\x4c\x5f\x50\x41\x54\x48\x25'
 SCRIPT_PATH="$(pwd)/scripts/guzios-magic-sauce.sh"
-FISH_SUBCOMMANDS="start stop send health restart kill inspect sh workdir cd fixown install uninstall update reinstall startd allow cleanup test help"
+FISH_SUBCOMMANDS="start stop send health restart kill inspect sh workdir fixown install uninstall update reinstall startd allow cleanup secret db test help"
 
 
 
@@ -146,11 +146,6 @@ fi
 
 if [ "$1" = "workdir" ]; then
     pwd;
-    exit;
-fi
-
-if [ "$1" = "cd" ]; then
-    echo "cd $(pwd)";
     exit;
 fi
 
@@ -418,13 +413,6 @@ if [ "$1" = "update" ]; then
         echo "Let's pray that this error won't cause a cascadning failure down the line.";
     fi
     
-    rm -rdfv "./web/public/*";
-    if [ $? -ne 0 ]; then
-        echo "Couldn't delete public web contents ahead of overwrite! See above for errors.";
-        echo "We won't halt the update at this stage becasue the ./scripts directory is alread gone.";
-        echo "Let's pray that this error won't cause a cascadning failure down the line.";
-    fi
-    
     rm -fv "./web/etc-caddy/Caddyfile";
     if [ $? -ne 0 ]; then
         echo "Couldn't delete the Caddyfile ahead of overwrite! See above for errors.";
@@ -436,7 +424,6 @@ if [ "$1" = "update" ]; then
     echo " ---STEP 3/6: COPYING---";
     mkdir -p "./web/etc-caddy/"
     cp --verbose --force "./update/web/etc-caddy/Caddyfile" "./web/etc-caddy/";
-    cp --verbose --recursive --force "./update/web/public" "./web/";
     cp --verbose --recursive "./update/scripts" "$(pwd)";
     cp "./update/docker-compose.yml" "./update/docker-compose-test.yml";
     GROUPID=$(cat /etc/group | grep docker | cut -d: -f3)
@@ -545,9 +532,23 @@ if [ "$1" = "allow" ]; then
 fi
 
 if [ "$1" = "cleanup" ]; then
+    echo "Clearing all UNUSED custom-built images. Even if no operations succede - this command will not throw a failure; it simply means it had a very easy job (literally nothing to do). If an image says that it's in use and can't be removed - do \`minecraft kill <its service>\` (NOT \`stop\`) first.";
     docker rmi "ghostland-ci";
     docker rmi "ghostland-web-custom";
+    exit 0;
+fi
+
+if [ "$1" = "secret" ]; then
+    if [ -z "$2" ]; then
+        echo "Please specify a secret name!";
+        exit 1;
+    fi
+    cat "./secrets/$2.txt"
     exit;
+fi
+
+if [ "$1" = "db" ]; then
+    docker run -it --network host --rm mysql mysql -h "$($SCRIPT_PATH secret db/host)" -u "$($SCRIPT_PATH secret db/accounts/user.txt)" -P "$($SCRIPT_PATH secret db/port)" -D "$($SCRIPT_PATH secret db/name)" -p"$($SCRIPT_PATH secret db/accounts/user_pass.txt)"
 fi
 
 
@@ -620,13 +621,17 @@ if [ "$1" = "help" ]; then
     echo "     \ Odinstalowuje skrypt, a następnie uruchamia instalator. Trochę jak \`update\`, ale nic nie pobiera."
     echo;
     echo " ---ZARZĄDZANIE DOCKEREM---";
-    echo "  [UWAGA: Wszystkie pod-komendy należy wykonać jako root, nawet jeśli jest się w grupie \`docker\`!]"
+    echo "  [UWAGA: allow i startd należy wykonać jako root, nawet jeśli jest się w grupie \`docker\`!]"
     echo "  - startd"
     echo "     \ Uruchamia daemon Dockera. Powinno wrzucić go również do autostartu, ale to nie zawsze działa."
     echo "  - allow <NAZWA_UŻYTKOWNIKA>"
     echo "     \ Dodaje wybranego użytkownika do grupy \`docker\`."
     echo "  - cleanup"
     echo "     \ Cleans up all images built by this compose file. Does NOT need sudo, unlike all other commands in this section."
+    echo "  - secret <ID>"
+    echo "     \ Prints the value of a Docker secret."
+    echo "  - db"
+    echo "     \ Connects to the database."
     echo;
     echo " ---RÓŻNE---";
     echo "  - test"
