@@ -106,9 +106,9 @@ secrets:
     db_table_accounts_ingame:
       file: ./secrets/db/tables/accounts_ingame.txt
     db_user:
-      file: ./secrets/db/accounts/packetfixer.txt
+      file: ./secrets/db/accounts/packetauth.txt
     db_password:
-      file: ./secrets/db/accounts/packetfixer_pass.txt
+      file: ./secrets/db/accounts/packetauth_pass.txt
     db_table_blocks:
       file: ./secrets/db/tables/blocks.txt
     bot_poltergeist:
