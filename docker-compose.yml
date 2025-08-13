@@ -20,14 +20,16 @@ services:
       - db_host
       - db_port
       - db_name
-      - db_table_accounts_ingame
       - db_user
       - db_password
+      - db_table_accounts_ingame
       - db_table_blocks
       - bot_poltergeist
     depends_on:
       ci:
         condition: service_healthy
+      db:
+        condition: service_started
     # MC Config
     environment:
       # Modpack
@@ -103,11 +105,36 @@ services:
       - ./builds:/srv/ci
       - ./web/caddy-data:/data
       - ./web/caddy-config:/config
+    depends_on:
+      ci:
+        condition: service_healthy
+      web-custom:
+        condition: service_started #TODO: Add proper healthchecks to web services
   
   web-custom:
     build: "https://github.com/Team-GhostLand/GL-web.git"
     restart: unless-stopped
     network_mode: "host"
+  
+  db:
+    image: mysql:9-oracle
+    restart: unless-stopped
+    network_mode: "host"
+    secrets:
+      - db_name
+      - db_root
+      - db_user
+      - db_password
+    volumes:
+      - "./db/data:/var/lib/mysql"
+      - "./db/config:/etc"
+    environment:
+      MYSQL_DATABASE_FILE: "/run/secrets/db_name"
+      MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root"
+      MYSQL_USER_FILE: "/run/secrets/db_user"
+      MYSQL_PASSWORD_FILE: "/run/secrets/db_password"
+    user: "42069:%DOCKER_GROUP_ID%"
+
 
 secrets:
     db_host:
@@ -116,12 +143,14 @@ secrets:
       file: ./secrets/db/port.txt
     db_name:
       file: ./secrets/db/name.txt
+    db_root:
+      file: ./secrets/db/accounts/root_pass.txt
+    db_user:
+      file: ./secrets/db/accounts/user.txt
+    db_password:
+      file: ./secrets/db/accounts/user_pass.txt
     db_table_accounts_ingame:
       file: ./secrets/db/tables/accounts_ingame.txt
-    db_user:
-      file: ./secrets/db/accounts/packetauth.txt
-    db_password:
-      file: ./secrets/db/accounts/packetauth_pass.txt
     db_table_blocks:
       file: ./secrets/db/tables/blocks.txt
     bot_poltergeist:
