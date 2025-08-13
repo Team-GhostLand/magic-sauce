@@ -28,6 +28,15 @@ services:
       # Java stuff
       MEMORY: "20G"
       USE_AIKAR_FLAGS: "true"   #  ...and others lower-? No fucking idea! I'm just following the docs, that's all.
+      # Secrets
+      CFG_DB_HOST_FILE: "/run/secrets/db_host"
+      CFG_DB_PORT_FILE: "/run/secrets/db_port"
+      CFG_DB_NAME_FILE: "/run/secrets/db_name"
+      CFG_DB_TABLE_FILE: "/run/secrets/db_table_accounts_ingame"
+      CFG_DB_USER_FILE: "/run/secrets/db_user"
+      CFG_DB_PASS_FILE: "/run/secrets/db_password"
+      CFG_DB_TABLE_DISABLED_FILE: "/run/secrets/db_table_blocks"
+      CFG_BOT_TOKEN_FILE: "/run/secrets/bot_poltergeist"
       # Misc
       UID: "42069"
       GID: "%DOCKER_GROUP_ID%"
@@ -86,3 +95,21 @@ services:
     build: "https://github.com/Team-GhostLand/GL-web.git"
     restart: unless-stopped
     network_mode: "host"
+
+secrets:
+    db_host:
+      file: ./secrets/db/host.txt
+    db_port:
+      file: ./secrets/db/port.txt
+    db_name:
+      file: ./secrets/db/name.txt
+    db_table_accounts_ingame:
+      file: ./secrets/db/tables/accounts_ingame.txt
+    db_user:
+      file: ./secrets/db/accounts/packetfixer.txt
+    db_password:
+      file: ./secrets/db/accounts/packetfixer_pass.txt
+    db_table_blocks:
+      file: ./secrets/db/tables/blocks.txt
+    bot_poltergeist:
+      file: ./secrets/bot_tokens/poltergeist.txt
