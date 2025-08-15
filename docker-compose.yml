@@ -114,6 +114,26 @@ services:
     restart: unless-stopped
     network_mode: "host"
   
+  bot-account:
+    build: "https://github.com/Team-GhostLand/Poltergeist.git"
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - ./bots/account:/usr/src/app/data
+    depends_on:
+      db:
+        condition: service_started
+    secrets:
+      - db_host
+      - db_port
+      - db_name
+      - db_user
+      - db_password
+      - bot_account
+      - bot_account_id
+      - bot_account_hook
+    user: "42069:%DOCKER_GROUP_ID%"
+  
   db:
     image: mysql:9-oracle
     restart: unless-stopped
@@ -151,3 +171,9 @@ secrets:
       file: ./secrets/db/tables/accounts_ingame.txt
     bot_poltergeist:
       file: ./secrets/bot_tokens/poltergeist.txt
+    bot_account:
+      file: ./secrets/bot_tokens/account.txt
+    bot_account_id:
+      file: ./secrets/bot_tokens/account_id.txt
+    bot_account_hook:
+      file: ./secrets/bot_tokens/account_hook.txt
