@@ -63,7 +63,7 @@ fi
 
 if [ "$1" = "start" ]; then
     echo "Server powering up. If you want to spectate the logs as it starts, run \`minecraft\` from a different terminal.";
-    docker compose up -d;
+    COMPOSE_BAKE=true docker compose up -d;
     exit;
 fi
 
