@@ -89,7 +89,7 @@ services:
       start_period: 120s # Considering how brutal the interval-retries policy is, we should give it a lot of time to start (2min ought to be enough), to be 100% sure that it won't die immidiatley upon startup.
       interval: 1s # Very brutal interval-retries policy becasue if this file ever disappears while the minecraft service is restarting - all hell will break loose. We REALLY want to make sure that as soon as this file goes missing, the service goes unhealthy (thus preventing minecraft from starting)
       retries: 2
-      timeout: 1s # a simple test command should run almost instantly (hell, even 1s might be too much, but I don't think this takes miliseconds)\
+      timeout: 1s # a simple test command should run almost instantly (hell, even 1s might be too much, but I don't think this takes miliseconds)
     environment:
       REPO: https://github.com/Team-GhostLand/GhostLand7.git
       NAME: GhostLand
