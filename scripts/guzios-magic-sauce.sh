@@ -535,6 +535,7 @@ if [ "$1" = "cleanup" ]; then
     echo "Clearing all UNUSED custom-built images. Even if no operations succede - this command will not throw a failure; it simply means it had a very easy job (literally nothing to do). If an image says that it's in use and can't be removed - do \`minecraft kill <its service>\` (NOT \`stop\`) first.";
     docker rmi "ghostland-ci";
     docker rmi "ghostland-web-custom";
+    docker rmi "ghostland-bot-account";
     exit 0;
 fi
 
