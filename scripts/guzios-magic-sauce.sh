@@ -506,12 +506,12 @@ if [ "$1" = "startd" ]; then
         exit 1;
     fi
     echo "                        >>>>>    Status before:    <<<<<";
-    systemctl status --no-pager -l docker.socket docker.service;
+    systemctl status --lines 0 -l docker.socket docker.service;
     systemctl enable docker.socket docker.service;
     systemctl start docker.socket docker.service;
     echo;
     echo "                        >>>>>    Status  after:    <<<<<";
-    systemctl status --no-pager -l docker.socket docker.service;
+    systemctl status --lines 0 -l docker.socket docker.service;
     exit 0;
 fi
 
