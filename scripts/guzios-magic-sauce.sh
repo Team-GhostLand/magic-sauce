@@ -549,6 +549,7 @@ fi
 
 if [ "$1" = "db" ]; then
     docker run -it --network host --rm mysql mysql -h "$($SCRIPT_PATH secret db/host)" -u "$($SCRIPT_PATH secret db/accounts/user)" -P "$($SCRIPT_PATH secret db/port)" -D "$($SCRIPT_PATH secret db/name)" -p"$($SCRIPT_PATH secret db/accounts/user_pass)"
+    exit;
 fi
 
 
