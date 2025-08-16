@@ -49,7 +49,7 @@ services:
       CFG_DB_USER_FILE: "/run/secrets/db_user"
       CFG_DB_PASS_FILE: "/run/secrets/db_password"
       CFG_BOT_TOKEN_FILE: "/run/secrets/bot_poltergeist"
-      CFG_SEED_file: "/run/secrets/seed"
+      CFG_SEED_FILE: "/run/secrets/seed"
       # Desperatley trying to get Secrets to work
       REPLACE_ENV_VARIABLES: "TRUE"
       ENV_VARIABLE_PREFIX: "CFG_"
