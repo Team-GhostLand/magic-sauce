@@ -37,7 +37,6 @@ services:
       VERSION: "1.21.11"
       FABRIC_LOADER_VERSION: "0.18.2"
       FABRIC_INSTALLER_VERSION: "1.1.0"
-
       # Minecraft stuff
       GUI: "FALSE"
       EULA: "TRUE"              #  Why are some bools upper-case...
@@ -157,7 +156,6 @@ services:
       MYSQL_USER_FILE: "/run/secrets/db_user"
       MYSQL_PASSWORD_FILE: "/run/secrets/db_password"
     user: "42069:121"
-
 
 secrets:
     db_host:
