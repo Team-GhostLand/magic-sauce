@@ -8,7 +8,7 @@ services:
     stdin_open: true
     network_mode: "host"
     volumes:
-      - "./minecraft/gl7:/data"
+      - "./minecraft/ghostrun:/data"
       - "./builds:/modpacks:ro"
     restart: unless-stopped
     healthcheck:
@@ -33,8 +33,11 @@ services:
     # MC Config
     environment:
       # Modpack
-      TYPE: "MODRINTH"
-      MODRINTH_MODPACK: "/modpacks/latest_server.mrpack"
+      TYPE: "FABRIC"
+      VERSION: "1.21.11"
+      FABRIC_LOADER_VERSION: "0.18.2"
+      FABRIC_INSTALLER_VERSION: "1.1.0"
+
       # Minecraft stuff
       GUI: "FALSE"
       EULA: "TRUE"              #  Why are some bools upper-case...
@@ -57,13 +60,11 @@ services:
       REPLACE_ENV_DURING_SYNC: "true"
       # Misc
       UID: "42069"
-      GID: "%DOCKER_GROUP_ID%"
+      GID: "121"
       TZ: "Europe/Warsaw"
       LOG_TIMESTAMP: "true"
-      MODRINTH_FORCE_SYNCHRONIZE: "true"
-      DATAPACKS: "/data/datapacks"
       LEVEL: "world"
-  
+      DATAPACKS: "datapacks/"  
   #backuper:
     #image: itzg/mc-backup
     #user: "42069"
@@ -136,7 +137,7 @@ services:
       - bot_account
       - bot_account_id
       - bot_account_hook
-    user: "42069:%DOCKER_GROUP_ID%"
+    user: "42069:121"
   
   db:
     image: mysql:9-oracle
@@ -155,7 +156,7 @@ services:
       MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root"
       MYSQL_USER_FILE: "/run/secrets/db_user"
       MYSQL_PASSWORD_FILE: "/run/secrets/db_password"
-    user: "42069:%DOCKER_GROUP_ID%"
+    user: "42069:121"
 
 
 secrets:
