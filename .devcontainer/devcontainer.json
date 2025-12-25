@@ -1,7 +1,8 @@
 {
-	"name": "Devcontainer for shell scripts",
+	"name": "Devcontainer for magic-sauce",
 	"image": "mcr.microsoft.com/devcontainers/base:noble",
 	"features": {
-		"ghcr.io/guziomg/devcontainers/personal:latest": {}
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}, //For Compose definitions
+		"ghcr.io/guziomg/devcontainers/personal:latest": {}      //Shellcheck, mostly
 	}
 }
