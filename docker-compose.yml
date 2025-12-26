@@ -95,6 +95,7 @@ services:
     environment:
       REPO: https://github.com/Team-GhostLand/GhostLand7.git
       NAME: CraftMine
+      PACK: GhostRunCM
   
   web:
     image: caddy:alpine
