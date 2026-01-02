@@ -94,6 +94,7 @@ services:
       timeout: 1s # a simple test command should run almost instantly (hell, even 1s might be too much, but I don't think this takes miliseconds)
     environment:
       REPO: https://github.com/Team-GhostLand/GhostLand7.git
+      PACK: GhostRun_Winter2025_26
   
   web:
     image: caddy:alpine
