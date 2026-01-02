@@ -4,5 +4,12 @@
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}, //For Compose definitions
 		"ghcr.io/guziomg/devcontainers/personal:latest": {}      //Shellcheck, mostly
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"matthewpi.caddyfile-support"
+			]
+		}
 	}
 }
