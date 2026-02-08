@@ -122,6 +122,10 @@ services:
     network_mode: "host"
     volumes:
       - ./bots/account:/usr/src/app/data
+      - .minecraft/ghostrun/world.older/stats:/usr/src/app/data/statdirs/GhostRun:ro
+      - .minecraft/ghostrun/world/stats:/usr/src/app/data/statdirs/Ghostland7.5_GhostRun:ro
+      - .minecraft/gl7/world/stats:/usr/src/app/data/statdirs/Ghostland7:ro
+      - .minecraft/craftmine/world/stats:/usr/src/app/data/statdirs/Craftmine:ro
     depends_on:
       db:
         condition: service_started
