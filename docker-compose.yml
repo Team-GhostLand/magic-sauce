@@ -8,7 +8,7 @@ services:
     stdin_open: true
     network_mode: "host"
     volumes:
-      - "./minecraft/ghostrun:/data"
+      - "./minecraft/gl7:/data"
       - "./builds:/modpacks:ro"
     restart: unless-stopped
     healthcheck:
@@ -62,23 +62,23 @@ services:
       LOG_TIMESTAMP: "true"
       LEVEL: "world"
       DATAPACKS: "datapacks/"  
-  #backuper:
-    #image: itzg/mc-backup
-    #user: "42069"
-    #depends_on:
-      #minecraft:
-        #condition: service_healthy
-    #environment:
-      #BACKUP_INTERVAL: "10h"
-      #RCON_HOST: "minecraft"
-      #INITIAL_DELAY: 0
-      #EXCLUDES: "*.jar,cache,logs,*.tmp,.cache,.e4mc_cache,.fabric,.mixin.out,crash-reports,immersive_paintings_cache,libraries,modernfix,versions,usercache.json,usernamecache.json"
-      #TZ: "Europe/Warsaw"
-      #BACKUP_NAME: "full"
-      #PRUNE_BACKUPS_DAYS: 3
-    #volumes:
-      #- ./minecraft/gl6:/data:ro
-      #- ./backups/gl6:/backups
+  backuper:
+    image: itzg/mc-backup
+    user: "42069"
+    depends_on:
+      minecraft:
+        condition: service_healthy
+    environment:
+      BACKUP_INTERVAL: "10h"
+      RCON_HOST: "minecraft"
+      INITIAL_DELAY: 0
+      EXCLUDES: ".cache,.fabric,.fabric-manifest.json,.install-modrinth.env,.local,.mixin.out,.modrinth-modpack-manifest.json,.rcon-cli.env,.rcon-cli.yaml,config,crash-reports,credits.txt,debug,defaultconfigs,eula.txt,*.jar,*.log,icon.png,immersive_paintings_cache,kiwipacks,libraries,locale_cache,logs,modernfix,mods,observable_announce,patchouli_books,server-icon.png,server.properties,shaderpacks,usercache.json,usernamecache.json,versions,wrld_minimal_backup.zip"
+      TZ: "Europe/Warsaw"
+      BACKUP_NAME: "full"
+      PRUNE_BACKUPS_DAYS: 3
+    volumes:
+      - ./minecraft/gl7:/data:ro
+      - ./backups/gl7:/backups
   
   ci:
     build: "https://github.com/Team-GhostLand/Grinch.git"
@@ -94,7 +94,7 @@ services:
       timeout: 1s # a simple test command should run almost instantly (hell, even 1s might be too much, but I don't think this takes miliseconds)
     environment:
       REPO: https://github.com/Team-GhostLand/GhostLand7.git
-      PACK: GhostRun_Winter2025_26
+      PACK: GhostLand7
   
   web:
     image: caddy:alpine
