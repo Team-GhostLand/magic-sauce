@@ -32,7 +32,7 @@ services:
     environment:
       # Modpack
       TYPE: "MODRINTH"
-      MODRINTH_MODPACK: "/modpacks/GhostRun 0.1.6.mrpack.mrpack"
+      MODRINTH_MODPACK: "/modpacks/GhostRun 0.1.6.mrpack"
       # Minecraft stuff
       GUI: "FALSE"
       EULA: "TRUE"
