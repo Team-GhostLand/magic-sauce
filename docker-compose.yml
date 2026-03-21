@@ -83,12 +83,12 @@ services:
     restart: unless-stopped
     network_mode: "host"
     volumes:
-      - "/mnt/block100/ghostland/bots/account:/usr/src/app/data"
-      - "/mnt/block100/ghostland/minecraft/ghostrun/world.older/stats:/usr/src/app/data/statdirs/GhostRun:ro"
-      - "/mnt/block100/ghostland/minecraft/ghostrun/world/stats:/usr/src/app/data/statdirs/Ghostland7.5_GhostRun:ro"
-      - "/mnt/block100/ghostland/minecraft/GL7/world/stats:/usr/src/app/data/statdirs/Ghostland7:ro"
-      - "/mnt/block100/ghostland/minecraft/craftmine/world/stats:/usr/src/app/data/statdirs/Craftmine:ro"
-      - "/mnt/block100/ghostland/minecraft/GRH/world/stats:/usr/src/app/data/statdirs/GRH:ro"
+      - "./bots/account:/usr/src/app/data"
+      - "./minecraft/ghostrun/world.older/stats:/usr/src/app/data/statdirs/GhostRun:ro"
+      - "./minecraft/ghostrun/world/stats:/usr/src/app/data/statdirs/Ghostland7.5_GhostRun:ro"
+      - "./minecraft/GL7/world/stats:/usr/src/app/data/statdirs/Ghostland7:ro"
+      - "./minecraft/craftmine/world/stats:/usr/src/app/data/statdirs/Craftmine:ro"
+      - "./minecraft/GRH/world/stats:/usr/src/app/data/statdirs/GRH:ro"
     depends_on:
       db:
         condition: service_started
@@ -113,8 +113,8 @@ services:
       - db_user
       - db_password
     volumes:
-      - "/mnt/block100/ghostland/db/data:/var/lib/mysql"
-      - "/mnt/block100/ghostland/db/config:/etc"
+      - "./db/data:/var/lib/mysql"
+      - "./db/config:/etc"
     environment:
       MYSQL_DATABASE_FILE: "/run/secrets/db_name"
       MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root"
@@ -124,26 +124,26 @@ services:
 
 secrets:
   db_host:
-    file: /var/spectre/ghostland/secrets/db/host.txt
+    file: ./secrets/db/host.txt
   db_port:
-    file: /var/spectre/ghostland/secrets/db/port.txt
+    file: ./secrets/db/port.txt
   db_name:
-    file: /var/spectre/ghostland/secrets/db/name.txt
+    file: ./secrets/db/name.txt
   db_root:
-    file: /var/spectre/ghostland/secrets/db/accounts/root_pass.txt
+    file: ./secrets/db/accounts/root_pass.txt
   db_user:
-    file: /var/spectre/ghostland/secrets/db/accounts/user.txt
+    file: ./secrets/db/accounts/user.txt
   db_password:
-    file: /var/spectre/ghostland/secrets/db/accounts/user_pass.txt
+    file: ./secrets/db/accounts/user_pass.txt
   db_table_accounts_ingame:
-    file: /var/spectre/ghostland/secrets/db/tables/accounts_ingame.txt
+    file: ./secrets/db/tables/accounts_ingame.txt
   bot_poltergeist:
-    file: /var/spectre/ghostland/secrets/bot_tokens/poltergeist.txt
+    file: ./secrets/bot_tokens/poltergeist.txt
   bot_account:
-    file: /var/spectre/ghostland/secrets/bot_tokens/account.txt
+    file: ./secrets/bot_tokens/account.txt
   bot_account_id:
-    file: /var/spectre/ghostland/secrets/bot_tokens/account_id.txt
+    file: ./secrets/bot_tokens/account_id.txt
   bot_account_hook:
-    file: /var/spectre/ghostland/secrets/bot_tokens/account_hook.txt
+    file: ./secrets/bot_tokens/account_hook.txt
   seed:
     file: ./secrets/seed.txt
