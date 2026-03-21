@@ -7,7 +7,7 @@ services:
     stdin_open: true
     network_mode: "host"
     volumes:
-      - "/mnt/block100/ghostland/minecraft/GRH:/data"
+      - "./minecraft/GRH:/data"
       - "./builds:/modpacks:ro"
     restart: unless-stopped
     healthcheck:
@@ -25,14 +25,14 @@ services:
       - bot_poltergeist
       - seed
     depends_on:
-      ci:
-        condition: service_healthy
+      #ci:
+        #condition: service_healthy
       db:
         condition: service_started
     environment:
       # Modpack
       TYPE: "MODRINTH"
-      MODRINTH_MODPACK: "/modpacks/latest_server.mrpack"
+      MODRINTH_MODPACK: "/modpacks/GhostRun 0.1.6.mrpack.mrpack"
       # Minecraft stuff
       GUI: "FALSE"
       EULA: "TRUE"
@@ -61,21 +61,21 @@ services:
       LEVEL: "world"
       DATAPACKS: "datapacks/"
 
-  ci:
-    build: "https://github.com/Team-GhostLand/Grinch.git"
-    network_mode: "host"
-    volumes:
-      - "./builds:/exports"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "test -e /exports/latest_server.mrpack"]
-      start_period: 120s
-      interval: 1s
-      retries: 2
-      timeout: 1s
-    environment:
-      REPO: https://github.com/Team-GhostLand/grun.git
-      PACK: GhostRunHardcore
+  #ci:
+    #build: "https://github.com/Team-GhostLand/Grinch.git"
+    #network_mode: "host"
+    #volumes:
+      #- "./builds:/exports"
+    #restart: unless-stopped
+    #healthcheck:
+      #test: ["CMD-SHELL", "test -e /exports/latest_server.mrpack"]
+      #start_period: 120s
+      #interval: 1s
+      #retries: 2
+      #timeout: 1s
+    #environment:
+      #REPO: https://github.com/Team-GhostLand/grun.git
+      #PACK: GhostRunHardcore
 
   bot-account:
     build: "https://github.com/Team-GhostLand/Poltergeist.git"
