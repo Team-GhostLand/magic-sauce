@@ -23,7 +23,6 @@ services:
       - db_password
       - db_table_accounts_ingame
       - bot_poltergeist
-      - seed
     depends_on:
       #ci:
         #condition: service_healthy
