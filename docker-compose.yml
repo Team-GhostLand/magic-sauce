@@ -7,7 +7,7 @@ services:
     stdin_open: true
     network_mode: "host"
     volumes:
-      - "./minecraft/GRH:/data"
+      - "./minecraft/GCM:/data"
       - "./builds:/modpacks:ro"
     restart: unless-stopped
     healthcheck:
@@ -32,7 +32,7 @@ services:
     environment:
       # Modpack
       TYPE: "MODRINTH"
-      MODRINTH_MODPACK: "/modpacks/GhostRun 0.1.6.mrpack"
+      MODRINTH_MODPACK: "/modpacks/CraftMine 1.2.0 - Server Edition.mrpack"
       # Minecraft stuff
       GUI: "FALSE"
       EULA: "TRUE"
@@ -89,6 +89,7 @@ services:
       - "./minecraft/GL7/world/stats:/usr/src/app/data/statdirs/Ghostland7:ro"
       - "./minecraft/craftmine/world/stats:/usr/src/app/data/statdirs/Craftmine:ro"
       - "./minecraft/GRH/world/stats:/usr/src/app/data/statdirs/GRH:ro"
+      - "./minecraft/GCM/world/stats:/usr/src/app/data/statdirs/GCM:ro"
     depends_on:
       db:
         condition: service_started
