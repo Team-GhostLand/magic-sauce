@@ -107,8 +107,8 @@ services:
       - ./web/caddy-data:/data
       - ./web/caddy-config:/config
     depends_on:
-      ci:
-        condition: service_healthy
+      #ci:
+        #condition: service_healthy
       web-custom:
         condition: service_started #TODO: Add proper healthchecks to web services
   
