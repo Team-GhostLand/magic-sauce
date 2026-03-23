@@ -1,7 +1,8 @@
-name: "ghostland-grh"
+name: "ghostland"
 
 services:
   minecraft:
+    # Docker Config
     image: "itzg/minecraft-server:java21-graalvm"
     tty: true
     stdin_open: true
@@ -12,9 +13,9 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mc-health"]
-      start_period: 210s
+      start_period: 210s #3,5min
       interval: 3s
-      retries: 40
+      retries: 40 #extra 2min
     secrets:
       - db_host
       - db_port
@@ -29,17 +30,17 @@ services:
         #condition: service_healthy
       db:
         condition: service_started
+    # MC Config
     environment:
       # Modpack
       TYPE: "MODRINTH"
       MODRINTH_MODPACK: "/modpacks/CraftMine 1.2.0 - Server Edition.mrpack"
       # Minecraft stuff
       GUI: "FALSE"
-      EULA: "TRUE"
-      PORT: "25565"
+      EULA: "TRUE"              #  Why are some bools upper-case...
       # Java stuff
       MEMORY: "18G"
-      USE_AIKAR_FLAGS: "true"
+      USE_AIKAR_FLAGS: "true"   #  ...and others lower-case? No fucking idea! I'm just following the docs, that's all.
       # Secrets
       CFG_DB_HOST_FILE: "/run/secrets/db_host"
       CFG_DB_PORT_FILE: "/run/secrets/db_port"
@@ -49,7 +50,7 @@ services:
       CFG_DB_PASS_FILE: "/run/secrets/db_password"
       CFG_BOT_TOKEN_FILE: "/run/secrets/bot_poltergeist"
       CFG_SEED_FILE: "/run/secrets/seed"
-      # Secrets injection
+      # Desperatley trying to get Secrets to work
       REPLACE_ENV_VARIABLES: "TRUE"
       ENV_VARIABLE_PREFIX: "CFG_"
       REPLACE_ENV_IN_PLACE: "true"
@@ -61,23 +62,61 @@ services:
       LOG_TIMESTAMP: "true"
       LEVEL: "world"
       DATAPACKS: "datapacks/"
-
+  
+  #backuper:
+    #image: itzg/mc-backup
+    #user: "42069"
+    #depends_on:
+      #minecraft:
+        #condition: service_healthy
+    #environment:
+      #BACKUP_INTERVAL: "10h"
+      #RCON_HOST: "minecraft"
+      #INITIAL_DELAY: 0
+      #EXCLUDES: ".cache,.fabric,.fabric-manifest.json,.install-modrinth.env,.local,.mixin.out,.modrinth-modpack-manifest.json,.rcon-cli.env,.rcon-cli.yaml,config,crash-reports,credits.txt,debug,defaultconfigs,eula.txt,*.jar,*.log,icon.png,immersive_paintings_cache,kiwipacks,libraries,locale_cache,logs,modernfix,mods,observable_announce,patchouli_books,server-icon.png,server.properties,shaderpacks,usercache.json,usernamecache.json,versions,wrld_minimal_backup.zip"
+      #TZ: "Europe/Warsaw"
+      #BACKUP_NAME: "full"
+      #PRUNE_BACKUPS_DAYS: 3
+    #volumes:
+      #- ./minecraft/gl7:/data:ro
+      #- ./backups/gl7:/backups
+  
   #ci:
     #build: "https://github.com/Team-GhostLand/Grinch.git"
     #network_mode: "host"
     #volumes:
       #- "./builds:/exports"
-    #restart: unless-stopped
+    #restart: unless-stopped # Used to be on-failure:5, to prevent it from failure-looping if something catastropic happens (eg. it can't connect to GitHub or the ZIP file is corrupted). But it seems that, every once in a while, it will EITHER just randomly fail (and after this happens 5 times, it will fail permanently) OR exit as „completed” (we don't yet know which it is), which usually means we have to manually restart it every 3 days or so. Until we properly debug what tf is going on - this needs to be set to unless-stopped for the Continuus Inregration to actually stay continuus.
     #healthcheck:
       #test: ["CMD-SHELL", "test -e /exports/latest_server.mrpack"]
-      #start_period: 120s
-      #interval: 1s
+      #start_period: 120s # Considering how brutal the interval-retries policy is, we should give it a lot of time to start (2min ought to be enough), to be 100% sure that it won't die immidiatley upon startup.
+      #interval: 1s # Very brutal interval-retries policy becasue if this file ever disappears while the minecraft service is restarting - all hell will break loose. We REALLY want to make sure that as soon as this file goes missing, the service goes unhealthy (thus preventing minecraft from starting)
       #retries: 2
-      #timeout: 1s
+      #timeout: 1s # a simple test command should run almost instantly (hell, even 1s might be too much, but I don't think this takes miliseconds)
     #environment:
-      #REPO: https://github.com/Team-GhostLand/grun.git
-      #PACK: GhostRunHardcore
-
+      #REPO: https://github.com/Team-GhostLand/GhostLand7.git
+      #PACK: GhostLand7
+  
+  web:
+    image: caddy:alpine
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - ./web/etc-caddy:/etc/caddy
+      - ./builds:/srv/ci
+      - ./web/caddy-data:/data
+      - ./web/caddy-config:/config
+    depends_on:
+      ci:
+        condition: service_healthy
+      web-custom:
+        condition: service_started #TODO: Add proper healthchecks to web services
+  
+  web-custom:
+    build: "https://github.com/Team-GhostLand/GL-web.git"
+    restart: unless-stopped
+    network_mode: "host"
+  
   bot-account:
     build: "https://github.com/Team-GhostLand/Poltergeist.git"
     restart: unless-stopped
@@ -103,7 +142,7 @@ services:
       - bot_account_id
       - bot_account_hook
     user: "42069:121"
-
+  
   db:
     image: mysql:9-oracle
     restart: unless-stopped
@@ -124,27 +163,27 @@ services:
     user: "42069:121"
 
 secrets:
-  db_host:
-    file: ./secrets/db/host.txt
-  db_port:
-    file: ./secrets/db/port.txt
-  db_name:
-    file: ./secrets/db/name.txt
-  db_root:
-    file: ./secrets/db/accounts/root_pass.txt
-  db_user:
-    file: ./secrets/db/accounts/user.txt
-  db_password:
-    file: ./secrets/db/accounts/user_pass.txt
-  db_table_accounts_ingame:
-    file: ./secrets/db/tables/accounts_ingame.txt
-  bot_poltergeist:
-    file: ./secrets/bot_tokens/poltergeist.txt
-  bot_account:
-    file: ./secrets/bot_tokens/account.txt
-  bot_account_id:
-    file: ./secrets/bot_tokens/account_id.txt
-  bot_account_hook:
-    file: ./secrets/bot_tokens/account_hook.txt
-  seed:
-    file: ./secrets/seed.txt
+    db_host:
+      file: ./secrets/db/host.txt
+    db_port:
+      file: ./secrets/db/port.txt
+    db_name:
+      file: ./secrets/db/name.txt
+    db_root:
+      file: ./secrets/db/accounts/root_pass.txt
+    db_user:
+      file: ./secrets/db/accounts/user.txt
+    db_password:
+      file: ./secrets/db/accounts/user_pass.txt
+    db_table_accounts_ingame:
+      file: ./secrets/db/tables/accounts_ingame.txt
+    bot_poltergeist:
+      file: ./secrets/bot_tokens/poltergeist.txt
+    bot_account:
+      file: ./secrets/bot_tokens/account.txt
+    bot_account_id:
+      file: ./secrets/bot_tokens/account_id.txt
+    bot_account_hook:
+      file: ./secrets/bot_tokens/account_hook.txt
+    seed:
+      file: ./secrets/seed.txt
