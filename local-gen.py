@@ -309,7 +309,8 @@ if __name__ == "__main__":
 
 	elif sys.argv[1] == "compose":
 		try:
-			build(parsed)
+			if build(parsed):
+				print("WARNING: GENERATED OUTPUT CONTAINS A MINECRAFT SERVER COMPOSE DEFINITION, THAT COMES WITH THE EULA PRE-APPROVED. BY LAUNCHING THAT SERVER VIA THE MEANS SPECIFIED BELOW, OR ANY OTHER MEANS, YOU HERBY COMPLY WITH BOTH MOJANG EULAS AVAILABLE AT https://aka.ms/MCUGEULA AND https://aka.ms/MCUsageGuidelines AS WELL AS MICROSOFT TOS AT https://www.microsoft.com/servicesagreement - IF YOU DO NOT WISH TO COMPLY WITH ANY OF THE SPECIFIED DOCUMENTS, PLEASE REGENERATE YOUR COMPOSE DEFINITION WITHOUT THE MINECRAFT COMPONENT, BEFORE RUNNING IT FOR THE FIRST TIME!")
 			print("Generated! (Re)build and run the container with \"docker compose up -d\" or via your management system (eg. JifoCC if on GhostLand).")
 		except Exception as e:
 			print(f"Something went wrong: {e}")
