@@ -1,2 +1,2 @@
 java25-graalvm
-/modpacks/GL67.mrpack
+https://modrinth.com/modpack/skyblock-plus

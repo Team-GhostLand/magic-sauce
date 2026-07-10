@@ -3,10 +3,10 @@
     restart: unless-stopped
     network_mode: "host"
     volumes:
-      - ./web/etc-caddy:/etc/caddy
-      - ./builds:/srv/ci
-      - ./web/caddy-data:/data
-      - ./web/caddy-config:/config
+      - "./web/etc-caddy:/etc/caddy"
+      - "./modpacks:/srv/ci:ro"
+      - "./web/caddy-data:/data"
+      - "./web/caddy-config:/config"
     depends_on:
       web-custom:
         condition: service_started #TODO: Add proper healthchecks to web services

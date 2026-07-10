@@ -13,5 +13,6 @@
 /db
 /compose.yml
 /stats_export
+/bots
 #...Tho for this one, you'll probably want to create is manually, and mount some long-term storage drive there:
 /backups

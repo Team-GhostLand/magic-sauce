@@ -1,0 +1,2 @@
+Usually part of the modpack, but not in the example Skyblock one, apparently. Which pissed off the Docker image.
+So if you ever try to launch a modpack without datapacs and get the same kind of error - just make a dummy folder like this one.

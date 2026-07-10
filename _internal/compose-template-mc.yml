@@ -27,7 +27,7 @@
       db:
         condition: service_started
     post_start:
-      - command: "date >> /history.txt; echo $LAUNCHED_WITH_DIGEST >> /history.txt"
+      - command: "sh -c 'date >> /history.txt; echo \"$$LAUNCHED_WITH_DIGEST\" >> /history.txt'"
     # MC Config
     environment:
       # Modpack
