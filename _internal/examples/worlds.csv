@@ -1,3 +1,4 @@
 globalname1,instancename,innername
-globalname2,instancename,namethatnolongerexistsbutwillstillwork
-globalname3,namethatnolongerexistsbutwillstillworkaslongasyoudonttrytolaunchit,innername
+globalname2,instancename,name-that-no-longer-exists-but-will-still-work
+globalname3,name-that-no-longer-exists-but-will-still-work-as-long-as-you-dont-try-to-launch-it,innername
+my-epic-smp,populated-example,world
