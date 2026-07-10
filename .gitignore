@@ -1,9 +1,16 @@
-# All those folders will/should be there in a deployed (be it for prod or for testing) magic-sauce, but they contain local state, hence they should not end up on GitHub.
+# All those files and folders must be manually created and populated when deploying (be it for prod or for testing) magic-sauce, but they contain local state, hence they should not end up on GitHub.
+/instances
+/modpacks
+/secrets
+/_mc_options.txt
+/worlds.csv
 
-/minecraft
-/backups
-/builds
+# This gets auto-created for you:
 /web/caddy-config
 /web/caddy-data
 /db
-/secrets
+/_mc_hist.txt
+/compose.yml
+/stats_export
+#...Tho for this one, you'll probably want to create is manually, and mount some long-term storage drive there:
+/backups

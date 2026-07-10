@@ -1,0 +1,2 @@
+<RAM GBs (only integer - no fractions or units)>
+<Launched world global-name. If you don't want to load anything (but don't want to outright remove the file or make it entirely invalid, so that other aspects or the script (like stat syncing) can continue to work), type N/A (or anything else containing "/", but N/A is the most descriptive) here because that cannot be used as a pathname component on Linux/macOS (at least for a single directory), which makes it disallowed in world names.>

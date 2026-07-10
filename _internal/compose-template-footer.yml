@@ -1,0 +1,83 @@
+  web:
+    image: caddy:alpine
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - ./web/etc-caddy:/etc/caddy
+      - ./builds:/srv/ci
+      - ./web/caddy-data:/data
+      - ./web/caddy-config:/config
+    depends_on:
+      web-custom:
+        condition: service_started #TODO: Add proper healthchecks to web services
+  
+  web-custom:
+    build: "https://github.com/Team-GhostLand/GL-web.git"
+    restart: unless-stopped
+    network_mode: "host"
+  
+  bot-account:
+    build: "https://github.com/Team-GhostLand/Poltergeist.git"
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - "./bots/account:/usr/src/app/data"
+      - "./stats_export:/usr/src/app/data/statdirs/:ro"
+    depends_on:
+      db:
+        condition: service_started
+    secrets:
+      - db_host
+      - db_port
+      - db_name
+      - db_user
+      - db_password
+      - bot_account
+      - bot_account_id
+      - bot_account_hook
+    #user: "42069:121"
+  
+  db:
+    image: mysql:9-oracle
+    restart: unless-stopped
+    network_mode: "host"
+    secrets:
+      - db_name
+      - db_root
+      - db_user
+      - db_password
+    volumes:
+      - "./db/data:/var/lib/mysql"
+      - "./db/config:/etc"
+    environment:
+      MYSQL_DATABASE_FILE: "/run/secrets/db_name"
+      MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root"
+      MYSQL_USER_FILE: "/run/secrets/db_user"
+      MYSQL_PASSWORD_FILE: "/run/secrets/db_password"
+    #user: "42069:121"
+
+secrets:
+  db_host:
+    file: ./secrets/db/host.txt
+  db_port:
+    file: ./secrets/db/port.txt
+  db_name:
+    file: ./secrets/db/name.txt
+  db_root:
+    file: ./secrets/db/accounts/root_pass.txt
+  db_user:
+    file: ./secrets/db/accounts/user.txt
+  db_password:
+    file: ./secrets/db/accounts/user_pass.txt
+  db_table_accounts_ingame:
+    file: ./secrets/db/tables/accounts_ingame.txt
+  bot_poltergeist:
+    file: ./secrets/bot_tokens/poltergeist.txt
+  bot_account:
+    file: ./secrets/bot_tokens/account.txt
+  bot_account_id:
+    file: ./secrets/bot_tokens/account_id.txt
+  bot_account_hook:
+    file: ./secrets/bot_tokens/account_hook.txt
+  seed:
+    file: ./secrets/seed.txt
