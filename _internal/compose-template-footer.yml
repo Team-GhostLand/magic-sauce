@@ -26,6 +26,8 @@
     depends_on:
       db:
         condition: service_started
+      statsyncer:
+        condition: service_started
     secrets:
       - db_host
       - db_port
@@ -36,6 +38,13 @@
       - bot_account_id
       - bot_account_hook
     #user: "42069:121"
+  
+  statsyncer:
+    build: "."
+    restart: unless-stopped
+    volumes:
+      - "./instances/:/app/instances:ro"
+      - "./stats_export:/app/stats_export"
   
   db:
     image: mysql:9-oracle

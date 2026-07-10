@@ -325,7 +325,8 @@ if __name__ == "__main__":
 		print("\\-> 3-way comparison between your options (above), what Compose says, and what's actually running.")
 
 	elif sys.argv[1] == "stats":
-		print("mkdir -p \"stats_export\";")
+		print("rm -vr \"./stats_export\";")
+		print("mkdir -p \"./stats_export\";")
 		ran=False
 		for world in parsed.worlds.items():
 			ran=True
@@ -362,7 +363,7 @@ if __name__ == "__main__":
 			if comp.is_mc_running_what_its_supposed_to():
 				print("\\-> Which aligns with your Options", "- but somehow not your Compose (pls regen! - tho you WON'T need to rebuild the container)." if comp.is_mc_running_what_its_supposed_to() == "COMPOSE_LAGGING_BEHIND" else "and your Compose. All good!")
 			elif comp.is_mc_running_what_its_supposed_to() != None:
-				print("\\-> Which doesn't align with your Options -", "tho your Compose DOES align (so just rebuild the container)." if comp.is_mc_running_what_its_supposed_to() == False else "and neither does your Compose. Regen it, then rebuild the container!")
+				print("\\-> Which doesn't align with your Options. :<")
 			else:
 				pass # If comp.is_mc_running_what_its_supposed_to()==None, the digest is irrelevant, so we make no comments about it.
 		else:
