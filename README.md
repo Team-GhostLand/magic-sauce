@@ -2,7 +2,7 @@
 Tools for managing a Minecraft server via Docker, used on the GhostLand Modded SMP.
 
 ## What exactly does this do:
-It's basically a template engine for `compose.yml`. You can define instances, worlds, etc., and this will auto-generate a `compose.yml` based on [itzg/minecraft-server](docker-minecraft-server.readthedocs.io) for you.
+It's basically a template engine for `compose.yml`. You can define instances, worlds, etc., and this will auto-generate a `compose.yml` based on [itzg/minecraft-server](https://docker-minecraft-server.readthedocs.io/) for you.
 
 ## Repo structure:
 * `_internal/` - contains various magic-sauces assets: example configs and Compose templates. You probably want to edit this on GH (on a fork, if you're not from GhostLand), and not touch in regular operations (other than with a `git pull`).
