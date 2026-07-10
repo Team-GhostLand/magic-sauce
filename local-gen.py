@@ -7,6 +7,7 @@ FALLBACK_SKIPPED = "<skipped due to previous error>"
 
 
 def parse(dir="."+os.path.sep):
+	"""Produces a pre-filled-with-data, but yet unprocessed (please call .process() on the result, if needed), ParseResult object, based on all the data found in the specified dir (your shell workdir by default)."""
 	ram = 0
 	world = FALLBACK_SKIPPED
 	index = 1
@@ -76,6 +77,7 @@ def parse(dir="."+os.path.sep):
 	return result
 
 class ParseResult:
+	"""A hybrid between a result-carrier class for the parse() function, and a simple way to store _mc_options.txt in a deserialized form (if you don't populate it with any extra data (which is what parse() does) beyond what the constructor wants)."""
 	DEFAULT_INVALIDITY_REASON = "Data not processed yet. If seen in prod, there's a bug."
 	NO_INVALIDITY_REASON = None
 
@@ -91,6 +93,7 @@ class ParseResult:
 		self.parse_invalidity_reason = parse_invalidity_reason
 	
 	def process(self):
+		"""Populates the internal World and Instance objects."""
 		FALLBACK_NOTFOUND = "<not found>"
 		
 		if self.parse_invalidity_reason != self.DEFAULT_INVALIDITY_REASON and self.parse_invalidity_reason != self.NO_INVALIDITY_REASON:
@@ -115,10 +118,12 @@ class ParseResult:
 		return self
 	
 	def digest(self):
+		"""Produces a short string that at-a-glance describes all the data present withing this class. Think of it as a human-readable hash. Notably, None will be outputted instead, if the data stored here is in any way invalid, which means that calling "if <object name>.digest():" can serve as a validity check, eliminating the need for any .is_valid() function."""
 		if self.parse_invalidity_reason == self.NO_INVALIDITY_REASON:
 			return f"{self.options_world_name} ({self.processed_world.inner_name} in {self.processed_world.instance_name}@{self.processed_world_instance.modpack}) @ {self.processed_world_instance.java} with {self.options_ram}GB RAM"
 	
 	def print_opt(self):
+		"""prints the stored deserialized _mc_options.txt contents"""
 		print("LOADED OPTIONS:")
 		print("-> RAM GBs:", self.options_ram)
 		print("-> WORLD:", self.options_world_name)
@@ -129,6 +134,7 @@ class ParseResult:
 		print("-> STATUS:", f"Valid with digest: {self.digest()}" if self.digest() else f"Invalid because: {self.parse_invalidity_reason}")
 	
 	def print_all(self):
+		"""prints all stored data"""
 		print("WORLDS:")
 		ran = False
 		for instance in self.worlds.items():
@@ -160,17 +166,20 @@ class ParseResult:
 		self.print_opt()
 
 class World:
+	"""Stores the description of a world. Notably, it's a DESCRIPTION OF, not a REFERENCE TO it, which means that it stores the data within the world definition (instance and inner name), but not the name of the world definition (1st column of worlds.csv) itself."""
 	def __init__(self, instance_name: str, inner_name: str):
 		self.instance_name = instance_name
 		self.inner_name = inner_name
 
 class Instance:
+	"""Stores the description of an instance. Notably, it's a DESCRIPTION OF, not a REFERENCE TO it, which means that it stores the data within the instance's _mc_options.txt (Java and modpack), but not the name of the instance definition (folder) itself."""
 	def __init__(self, modpack: str, java: str):
 		self.modpack = modpack
 		self.java = java
 
 
 def compare(parsed: ParseResult|None=None, dir="."+os.path.sep):
+	"""Produces a CompareResult object. All the comparisons are done in the specified dir (your shell's workdir by default) and you can also pass a pre-cached processed ParseResult object if you already have one, so that it doesn't have to construct and process a new one."""
 	loaded:str|None = None
 	try:
 		with open(dir+"_mc_hist.txt") as f:
@@ -193,30 +202,37 @@ def compare(parsed: ParseResult|None=None, dir="."+os.path.sep):
 	return CompareResult(parsed.digest() if parsed else parse(dir).process().digest(), compose, loaded)
 
 class CompareResult:
+	"""A result-carrier class for the compare() function. What's stored inside is kinda useless on its own (just 3 digest strings), but you also get 8 booleanish (except one) interrogation-functions about this data, that let you get a clear picture of what's running what, and whether it's running what's actually supposed to."""
 	def __init__(self, digest_options: str|None, digestline_compose: str|None, digest_loaded: str|None):
 		self.digest_options = digest_options
 		self.digestline_compose = digestline_compose
 		self.digest_loaded = digest_loaded
 	
 	def should_compose_have_mc(self):
-		return self.digest_options != None
+		"""Whether your Options are valid (ie. whether we want a Minecraft container in compose, or not)."""
+		return bool(self.digest_options)
 	
 	def does_compose_have_mc(self):
-		return self.digestline_compose != None
+		"""Whether you have a Minecraft container in compose, or not."""
+		return bool(self.digestline_compose)
 	
 	def could_compose_match_options(self):
+		"""Whether it's even POSSIBLE for Compose's and Options' content to agree on the state of the Minecraft container - that is, to say, do they at least agree that it should exist. If this is false, regen your Compose."""
 		return self.should_compose_have_mc() == self.does_compose_have_mc()
 	
 	def does_compose_match_options(self):
+		"""Whether Compose's and Options' content agree on the state of the Minecraft container - that is, to say, if they both think that it should exist (if not, this passes-through the output from could_compose_match_options()), do they also agree on what it should be running (the global world name (and all its consequences) and the RAM size)."""
 		if self.should_compose_have_mc() and self.does_compose_have_mc():
 			return self.digestline_compose.find(self.digest_options) > -1
 		else:
 			return self.could_compose_match_options()
 	
 	def has_mc_been_run_at_least_once(self):
-		return self.digest_loaded != None
+		"""If there exists at least a single line in _mc_hist.txt - which would indicate that the server must've been launched at least once."""
+		return bool(self.digest_loaded)
 	
-	def should_mc_be_running_now_or_should_have_been_ran_at_least_once(self):
+	def should_mc_have_been_ran_at_least_once(self):
+		"""THE ONE NON-BOOLEANISH FUNCTION IN THIS CLASS! Well... It is booleanish, in the sense that its outputs can be read as a True/False value - except that this one always returns truthy ones (which actually makes some logical sense, if you thing about it - read 'till the end). More specifically, it returns a non-empty string that describes what Options and Compose think about whether the Minecraft container should've been ran at lest once. We opted to return strings because there is no way to answer this question without any assumptions, because it's IMPOSSIBLE to know if MC should've been ran at least once - that'd mean knowing if Options were valid at any point in time ever, and we can't exactly time-travel. This is why even the „falsiest” of all results (NOT_NOW__PAST_CONDITIONS_UNKNOWN) isn't really an outright No!, but an „Eh, maybe...?” at most. However, some heuristics may point at the past state - notably, if the Compose says that there is an MC container, then Options must've wanted one at some point in the past, too (regardless of what they say now). But simply treating this as True for the sake of being pedantic is wildly impractical because Options are the main Source of Truth and most consumers of this methods wouldn't want to have them just disregarded like that. So overall, instead of trying to find a shaky middle-ground, you get a string output and can interpret it however you wish. (Also, when you think about it, always outputting truthy values (ie. non-empty strings) makes a lot of sense, given how this project is specifically for Minecraft servers, so it's EXTREMELY likely that a Minecraft server was, at some point supposed to be running.)"""
 		if self.should_compose_have_mc() and self.does_compose_have_mc():
 			return "DEFINITELY"
 		elif not self.should_compose_have_mc() and not self.does_compose_have_mc():
@@ -226,10 +242,19 @@ class CompareResult:
 		else:
 			return "COMPOSE_REGEN_NEEDED__NOT_NOW_BY_OPTIONS__YES_BY_COMPOSE"
 	
-	def should_mc_be_running_now_or_should_have_been_ran_at_least_once_SIMPLER(self):
-		return self.should_mc_be_running_now_or_should_have_been_ran_at_least_once() == "DEFINITELY" or self.should_mc_be_running_now_or_should_have_been_ran_at_least_once() == "COMPOSE_REGEN_NEEDED__YES_BY_OPTIONS__NOT_NOW_BY_COMPOSE"
-	
+	def should_mc_have_been_ran_at_least_once_NAIVE(self):
+		"""A naïve way of booleanishly interpreting should_mc_have_been_ran_at_least_once()'s result, ie. assumes that Options are out main Source of Truth and ignores any hints at „MC shouldn't be running now, but likely was supposed to be ran at least once, actually”. In other words, this function basically tells you if Options want MC running, right here and now, despite its name hinting at some level of past-state analysis."""
+		return self.should_mc_have_been_ran_at_least_once() == "DEFINITELY" or self.should_mc_have_been_ran_at_least_once() == "COMPOSE_REGEN_NEEDED__YES_BY_OPTIONS__NOT_NOW_BY_COMPOSE"
+
+	def should_mc_have_been_ran_at_least_once_PEDANTIC(self):
+		"""An impractically pedantic way of booleanishly interpreting should_mc_have_been_ran_at_least_once()'s result, ie. if ANYTHING signals that MC should've been ran once, we return True. If there's nothing indicating that, we return None (falsy, but not outright a False) because can you REALLY be sure that nothing wanted it running at any point in time?"""
+		if self.should_mc_have_been_ran_at_least_once() == "NOT_NOW__PAST_CONDITIONS_UNKNOWN":
+			return None
+		else:
+			return True
+
 	def is_mc_running_what_its_supposed_to(self):
+		"""Attempts to answer the super-hard question of „Is Minecraft running when it's supposed to? If so, is it running what it's supposed to?”. Said question is super hard because it's impossible to truly know whether MC is running (only that it was launched at least once, but the process may be long dead), as far as this script is concerned (it doesn't integrate with Compose (to avoid conflicts with any management system it may become a part of, eg. JifoCC) so it can't just run a healthcheck). Also, „what it's supposed to” is a somewhat difficult question because technically a container is running what it's supposed to, if it aligns with its Compose definition - but in our case, the Compose definition can also (mis)align with the Options. ANYWAY, if you approach this in the most naïve way possible (ie. if Minecraft was launched at any point in time, then assume it's still running now; disregard Compose and compare straight to Options), then treating this function's output booleanishly is gonna be fine. Truthy means that your MC container aligns with options and there's no need to stop+rebuild+start it (tho it does NOT say anything about Compose or non-restarts, ie. „start” without „stop” or „stop+rebuild”) and Falsy means „Some attention may be needed” (whether that's simply rebuild+start, stop+rebuild+start, stop+regen+rebuild+start, simply stop, or a false alarm - it doesn't matter in this naïve case). For a more detailed breakdown of what this function's booleanish-but-not-boolean returns (None and various literals) mean, and how to act upon them, see code comments at each specific return or how we interpret the results in the Compare subcommand."""
 		if self.does_compose_match_options():
 			if self.digest_options != None:
 				return self.digest_loaded == self.digest_options #True? Yay, it's running what it's supposed to! False? It's fine, a valid Compose is waiting for you - just rebuild the container.
@@ -246,6 +271,7 @@ class CompareResult:
 
 
 def build(parsed: ParseResult|None=None, dir="."+os.path.sep):
+	"""Outputs a compose.yml to the specified dir (your shell's workdir by default), based on the templates found in that dir's _internal dir and a processed ParseResult object inputted. If you don't pass in any ParseResult object, or they're in any way unprocessed/invalid, then the resulting compose.yml will omit Minecraft (and this function will return False, as opposed to True if Minecraft were included)."""
 	lines = []
 	result = False
 	with open(dir+"_internal"+os.path.sep+"compose-template-header.yml") as f:
@@ -328,10 +354,10 @@ if __name__ == "__main__":
 		print("MINECRAFT SERVER:")
 		if comp.has_mc_been_run_at_least_once():
 			print("-> Was launched at min. once and MAYBE is still running (this command only checks launch hist.)")
-			if comp.should_mc_be_running_now_or_should_have_been_ran_at_least_once_SIMPLER():
-				print("\\-> But I'd hope it is because it SHOULD be, according to Options", "and Compose." if comp.should_mc_be_running_now_or_should_have_been_ran_at_least_once() == "DEFINITELY" else "- but not Compose (pls regen! - and then start, if needed).")
+			if comp.should_mc_have_been_ran_at_least_once_NAIVE():
+				print("\\-> But I'd hope it is because it SHOULD be, according to Options", "and Compose." if comp.should_mc_have_been_ran_at_least_once() == "DEFINITELY" else "- but not Compose (pls regen! - and then start, if needed).")
 			else:
-				print("\\-> But I'd hope it isn't because it SHOULDN'T be, according to Options", "and Compose." if comp.should_mc_be_running_now_or_should_have_been_ran_at_least_once() == "NOT_NOW__PAST_CONDITIONS_UNKNOWN" else "- but not Compose (pls regen! - and stop the container, if needed).")
+				print("\\-> But I'd hope it isn't because it SHOULDN'T be, according to Options", "and Compose." if comp.should_mc_have_been_ran_at_least_once() == "NOT_NOW__PAST_CONDITIONS_UNKNOWN" else "- but not Compose (pls regen! - and stop the container, if needed).")
 			print("-> MOST RECENT LAUNCH'S DIGEST:", comp.digest_loaded)
 			if comp.is_mc_running_what_its_supposed_to():
 				print("\\-> Which aligns with your Options", "- but somehow not your Compose (pls regen! - tho you WON'T need to rebuild the container)." if comp.is_mc_running_what_its_supposed_to() == "COMPOSE_LAGGING_BEHIND" else "and your Compose. All good!")
@@ -341,7 +367,7 @@ if __name__ == "__main__":
 				pass # If comp.is_mc_running_what_its_supposed_to()==None, the digest is irrelevant, so we make no comments about it.
 		else:
 			print("-> Was never launched.")
-			match comp.should_mc_be_running_now_or_should_have_been_ran_at_least_once():
+			match comp.should_mc_have_been_ran_at_least_once():
 				case "NOT_NOW__PAST_CONDITIONS_UNKNOWN":
 					print("\\->Which is good. Both your Options and Compose don't want it running rn. If it was never even launched, it sure as hell isn't running now.")
 				case "COMPOSE_REGEN_NEEDED__NOT_NOW_BY_OPTIONS__YES_BY_COMPOSE":
@@ -356,7 +382,7 @@ if __name__ == "__main__":
 		print("TO SUMMARIZE:")
 		print("-> OPTIONS WANT DIGEST:", parsed.digest() if comp.should_compose_have_mc() else "[NONE] - They don't even want MC running.")
 		print("-> DOES COMPOSE MATCH THAT:", "Yes!" if comp.does_compose_match_options() else "No - please regen it!")
-		if comp.should_mc_be_running_now_or_should_have_been_ran_at_least_once_SIMPLER():
+		if comp.should_mc_have_been_ran_at_least_once_NAIVE():
 			print("-> MC CONTAINER:", "Is running exactly what it's supposed to (unless it's not running at all)! Don't rebuild it (launch it, at most - if not running)." if comp.is_mc_running_what_its_supposed_to() else "May require some attention. See above for details.")
 			if comp.is_mc_running_what_its_supposed_to() == "COMPOSE_LAGGING_BEHIND":
 				print("|-> Yes, don't rebuild it, EVEN AFTER the Compose regen. Apparently, only Compose is lagging behind and MC is somehow already running whatever your Options want.")
