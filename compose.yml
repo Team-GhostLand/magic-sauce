@@ -55,7 +55,6 @@ services:
       - db_password
     volumes:
       - "./db/data:/var/lib/mysql"
-      - "./db/config:/etc"
     environment:
       MYSQL_DATABASE_FILE: "/run/secrets/db_name"
       MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root"
