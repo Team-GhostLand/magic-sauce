@@ -1,2 +1,0 @@
-java25-graalvm
-https://modrinth.com/modpack/skyblock-plus

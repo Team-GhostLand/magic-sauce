@@ -1,18 +1,6 @@
-# All those files and folders must be manually created and populated when deploying (be it for prod or for testing) magic-sauce, but they contain local state, hence they should not end up on GitHub.
-/instances
-/modpacks
+/downloads
 /secrets
-/_mc_options.txt
-/worlds.csv
-#This file can be empty, but you MUST MAKE SURE it exists, otherwise Docker will happily auto-create a folder with such name and break everything.
-/_mc_hist.txt
-
-# This gets auto-created for you:
 /web/caddy-config
 /web/caddy-data
 /db
-/compose.yml
-/stats_export
 /bots
-#...Tho for this one, you'll probably want to create is manually, and mount some long-term storage drive there:
-/backups

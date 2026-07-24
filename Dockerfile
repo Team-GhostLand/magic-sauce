@@ -1,4 +1,4 @@
-FROM python:3
+FROM alpine
 WORKDIR /app
-COPY . .
+COPY ./statd.sh .
 CMD [ "./statd.sh" ]

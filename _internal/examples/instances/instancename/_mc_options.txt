@@ -1,2 +1,0 @@
-<Docker image tag - eg. java25-graalvm or java8-alpine>
-<MR modpack, either as in-container file (so "/modpacks/[somefile].mrpack" (no quotes!), where "/modpacks/" is mounted from "./modpacks/") or anything else permitted by itzg/minecraft-server for Modrinth (as specified in the docs: https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms/mod-platforms/modrinth-modpacks/#modpack-project)>

@@ -1,10 +1,11 @@
 #!/bin/sh
 echo "===EXECUTED AT $(date)===";
-EXECUTE=$(./local-gen.py stats)
 echo "Will run:";
-echo "$EXECUTE";
+cat ./instances/*/export-my-stats.sh
+sleep 5
 echo "Running....";
-eval "$EXECUTE";
+eval "$(cat ./instances/*/export-my-stats.sh)";
+sleep 3
 echo "Done, waiting a minute until next run...";
 sleep 60
 exec "./statd.sh";

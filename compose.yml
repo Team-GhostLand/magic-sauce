@@ -1,15 +1,15 @@
+name: "ghostland-aux"
+
+services:
   web:
     image: caddy:alpine
     restart: unless-stopped
     network_mode: "host"
     volumes:
       - "./web/etc-caddy:/etc/caddy"
-      - "./modpacks:/srv/ci:ro"
+      - "./downloads:/srv/ci:ro"
       - "./web/caddy-data:/data"
       - "./web/caddy-config:/config"
-    depends_on:
-      web-custom:
-        condition: service_started #TODO: Add proper healthchecks to web services
   
   web-custom:
     build: "https://github.com/Team-GhostLand/GL-web.git"
@@ -22,7 +22,6 @@
     network_mode: "host"
     volumes:
       - "./bots/account:/usr/src/app/data"
-      - "./stats_export:/usr/src/app/data/statdirs/:ro"
     depends_on:
       db:
         condition: service_started
@@ -37,14 +36,13 @@
       - bot_account
       - bot_account_id
       - bot_account_hook
-    #user: "42069:121"
   
   statsyncer:
     build: "."
     restart: unless-stopped
     volumes:
-      - "./instances/:/app/instances:ro"
-      - "./stats_export:/app/stats_export"
+      - "./../:/app/instances:ro"
+      - "./bots/account/statdirs:/app/stats_export"
   
   db:
     image: mysql:9-oracle
@@ -63,9 +61,8 @@
       MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root"
       MYSQL_USER_FILE: "/run/secrets/db_user"
       MYSQL_PASSWORD_FILE: "/run/secrets/db_password"
-    #user: "42069:121"
 
-secrets:
+secrets: #you probably want to append this to any MC container, as well - just change the paths
   db_host:
     file: ./secrets/db/host.txt
   db_port:
