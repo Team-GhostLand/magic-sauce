@@ -8,7 +8,7 @@
 # this machine's public IP, then replace ":80" below with your
 # domain name.
 
-ghostland.ovh { # TODO: Ask Jifo to port-forward 80 (http 1+2), 443 (https 1+2), 80/udp (http 3) and 443/udp (https 3) - and switch to them, instead of RCON's 25575
+https://ghostland.ovh, https://ghostland.ovh:443, ghostland.ovh:443, http://ghostland.ovh, http://ghostland.ovh:80, ghostland.ovh:80, ghostland.ovh, https://localhost, https://localhost:443, localhost:443, http://localhost, http://localhost:80, localhost:80, localhost, https://91.189.34.187, https://91.189.34.187:443, 91.189.34.187:443, http://91.189.34.187, http://91.189.34.187:80, 91.189.34.187:80, 91.189.34.187 {
     
     handle_path /modules/* {
         
@@ -22,7 +22,7 @@ ghostland.ovh { # TODO: Ask Jifo to port-forward 80 (http 1+2), 443 (https 1+2),
         # For modules hosted as complete web servers by different services [only Create Track Map right now]
         reverse_proxy /railwaymap/* localhost:3876
         
-        redir / / permanent # Looks very stupid, but basically the first / means „modules/” (becasue prefixes are stripped), while the second is just "/" or the website root - in other words: this recirects from [URL]/modules/ to [URL]/
+        redir / / permanent # Looks very stupid, but basically the first / means „modules/” (because prefixes are stripped), while the second is just "/" or the website root - in other words: this redirects from [URL]/modules/ to [URL]/
     }
     
     handle {
