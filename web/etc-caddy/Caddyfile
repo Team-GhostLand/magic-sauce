@@ -5,10 +5,10 @@
 #
 # To use your own domain name (with automatic HTTPS), first make
 # sure your domain's A/AAAA DNS records are properly pointed to
-# this machine's public IP, then replace ":80" below with your
+# this machine's public IP, then replace ":8080" below with your
 # domain name.
 
-https://ghostland.ovh, https://ghostland.ovh:443, ghostland.ovh:443, http://ghostland.ovh, http://ghostland.ovh:80, ghostland.ovh:80, ghostland.ovh, https://localhost, https://localhost:443, localhost:443, http://localhost, http://localhost:80, localhost:80, localhost, https://91.189.34.187, https://91.189.34.187:443, 91.189.34.187:443, http://91.189.34.187, http://91.189.34.187:80, 91.189.34.187:80, 91.189.34.187 {
+:8080 {
     
     handle_path /modules/* {
         
