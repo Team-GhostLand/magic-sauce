@@ -8,6 +8,10 @@
 # this machine's public IP, then replace ":8080" below with your
 # domain name.
 
+{
+    admin off
+}
+
 :8080 {
     
     handle_path /modules/* {
