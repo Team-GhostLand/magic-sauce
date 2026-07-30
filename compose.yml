@@ -7,7 +7,7 @@ services:
     network_mode: "host"
     volumes:
       - "./web/etc-caddy:/etc/caddy"
-      - "./downloads:/srv/ci:ro"
+      - "./downloads:/srv/files:ro"
       - "./web/caddy-data:/data"
       - "./web/caddy-config:/config"
   
@@ -25,7 +25,7 @@ services:
     depends_on:
       db:
         condition: service_started
-      statsyncer:
+      jifo-snatcher:
         condition: service_started
     secrets:
       - db_host
@@ -37,12 +37,15 @@ services:
       - bot_account_id
       - bot_account_hook
   
-  statsyncer:
+  jifo-snatcher:
     build: "."
     restart: unless-stopped
+    network_mode: none
     volumes:
       - "./../:/app/instances:ro"
+      - "./../../websites/ghostland:/app/gl_web_statusful:ro"
       - "./bots/account/statdirs:/app/stats_export"
+      - "./downloads/api:/app/status_export"
   
   db:
     image: mysql:9-oracle

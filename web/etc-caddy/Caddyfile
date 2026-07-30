@@ -1,38 +1,25 @@
-# The Caddyfile is an easy way to configure your Caddy web server.
-#
-# Unless the file starts with a global options block, the first
-# uncommented line is always the address of your site.
-#
-# To use your own domain name (with automatic HTTPS), first make
-# sure your domain's A/AAAA DNS records are properly pointed to
-# this machine's public IP, then replace ":8080" below with your
-# domain name.
-
 {
     admin off
 }
 
 :2137 {
     
-    handle_path /modules/* {
+	# For all external modules
+    handle_path /external/* {
         
-        # FS-based modules (those, that get mounted in docker-compose.yml) [only CI right now]
+        # FS-based modules (those, that get mounted in docker-compose.yml)
         root * /srv
         encode
-        file_server browse {
-            hide /srv/ci/latest_server.mrpack 
-        }
+        file_server browse
         
-        # For modules hosted as complete web servers by different services [only Create Track Map right now]
-        reverse_proxy /railwaymap/* localhost:3876
+        # For modules hosted as complete web servers by different services [none right now]
+        #reverse_proxy /example_name/* localhost:000
         
-        redir / / permanent # Looks very stupid, but basically the first / means „modules/” (because prefixes are stripped), while the second is just "/" or the website root - in other words: this redirects from [URL]/modules/ to [URL]/
+        redir / https://github.com/Team-GhostLand/magic-sauce permanent
     }
     
+	# For the main website itself
     handle {
         reverse_proxy /* localhost:3000
     }
 }
-
-# Refer to the Caddy docs for more information:
-# https://caddyserver.com/docs/caddyfilex
