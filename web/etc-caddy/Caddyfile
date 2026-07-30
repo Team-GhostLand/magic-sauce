@@ -15,7 +15,7 @@
         # For modules hosted as complete web servers by different services [none right now]
         #reverse_proxy /example_name/* localhost:000
         
-        redir / https://github.com/Team-GhostLand/magic-sauce permanent
+        redir / https://github.com/Team-GhostLand/magic-sauce#web-services permanent
     }
     
 	# For the main website itself

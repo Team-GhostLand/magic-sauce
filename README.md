@@ -1,5 +1,5 @@
 # magic-sauce
-Auxiliary services for GhostLand.
+Auxiliary services for GhostLand. Actual Minecraft instances are managed by JifoCC. 
 
 ## Docker Services
 Docker services are all listed in the `compose.yml` file and are intended to be run via `docker compose` (podman is untested and considered unsupported)
