@@ -4,21 +4,33 @@
 
 :2137 {
     
-	# For all external modules
+    # For all external modules
     handle_path /external/* {
         
         # FS-based modules (those, that get mounted in docker-compose.yml)
         root * /srv
-        encode
+        encode zstd gzip
         file_server browse
         
         # For modules hosted as complete web servers by different services [none right now]
         #reverse_proxy /example_name/* localhost:000
         
+        # Redirects calls to /modules/ (only has / below, because the /modules prefix is stripped) to their docs
         redir / https://github.com/Team-GhostLand/magic-sauce#web-services permanent
+        
+        # Allowing CORS from anywhere, to make my dev life bearable (request from localhost) and to prevent being stuck in a web of various subdomains (GL-web has a lot, mostly owing to Jifo's deployment of this website on the main ghostland.ovh, so the sane deployment (this one) can only be on random subdomains)
+        header {
+            Access-Control-Allow-Headers *
+            Access-Control-Allow-Methods *
+            Access-Control-Allow-Origin *
+          }
+          @options {
+            method OPTIONS
+          }
+          respond @options 204
     }
     
-	# For the main website itself
+    # For the main website itself
     handle {
         reverse_proxy /* localhost:3000
     }
