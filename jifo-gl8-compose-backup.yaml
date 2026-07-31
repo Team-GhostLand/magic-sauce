@@ -1,0 +1,74 @@
+services:
+  mc:
+    # Docker Config
+    image: "itzg/minecraft-server:java25-graalvm"
+    container_name: "mc-ghostland8"
+    tty: true
+    stdin_open: true
+    network_mode: "host"
+    volumes:
+      - "/home/jifo/minecraft/ghostland8/data:/data"
+      - "/home/jifo/minecraft/_auxiliary/downloads/modpacks:/modpacks:ro"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mc-health"]
+      start_period: 210s #3,5min
+      interval: 3s
+      retries: 40 #extra 2min
+    secrets:
+      - db_host
+      - db_port
+      - db_name
+      - db_user
+      - db_password
+      - db_table_accounts_ingame
+      - bot_poltergeist
+    # MC Config
+    environment:
+      #don't put JAVA_OPTS here - they're handled automatically, and auto-tuned for your system, by USE_AIKAR_FLAGS!
+      #JAVA_OPTS: "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:InitiatingHeapOccupancyPercent=15 -XX:ParallelGCThreads=3 -XX:ConcGCThreads=1 -XX:+AlwaysPreTouch"
+      # Modpack
+      TYPE: "MODRINTH"
+      MODRINTH_MODPACK: "/modpacks/GhostLand 8b15.mrpack"
+      MODRINTH_FORCE_SYNCHRONIZE: "true"
+      MODRINTH_DEFAULT_EXCLUDE_INCLUDES: "" #Prevents the image from yeeting out EMI and Sinytra by default (see: https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms/mod-platforms/modrinth-modpacks/#default-excludeincludes)
+      # Minecraft stuff
+      GUI: "FALSE"
+      EULA: "TRUE"
+      # Java stuff
+      MEMORY: "20G"
+      USE_AIKAR_FLAGS: "true"
+      # Secrets include
+      CFG_DB_HOST_FILE: "/run/secrets/db_host"
+      CFG_DB_PORT_FILE: "/run/secrets/db_port"
+      CFG_DB_NAME_FILE: "/run/secrets/db_name"
+      CFG_DB_TABLE_FILE: "/run/secrets/db_table_accounts_ingame"
+      CFG_DB_USER_FILE: "/run/secrets/db_user"
+      CFG_DB_PASS_FILE: "/run/secrets/db_password"
+      CFG_BOT_TOKEN_FILE: "/run/secrets/bot_poltergeist"
+      # Secrets enable
+      REPLACE_ENV_VARIABLES: "TRUE"
+      ENV_VARIABLE_PREFIX: "CFG_"
+      REPLACE_ENV_IN_PLACE: "true"
+      REPLACE_ENV_DURING_SYNC: "true"
+      # Misc
+      TZ: "Europe/Warsaw"
+      LOG_TIMESTAMP: "true"
+
+secrets:
+    db_host:
+      file: /home/jifo/minecraft/_auxiliary/secrets/db/host.txt
+    db_port:
+      file: /home/jifo/minecraft/_auxiliary/secrets/db/port.txt
+    db_name:
+      file: /home/jifo/minecraft/_auxiliary/secrets/db/name.txt
+    db_root:
+      file: /home/jifo/minecraft/_auxiliary/secrets/db/accounts/root_pass.txt
+    db_user:
+      file: /home/jifo/minecraft/_auxiliary/secrets/db/accounts/user.txt
+    db_password:
+      file: /home/jifo/minecraft/_auxiliary/secrets/db/accounts/user_pass.txt
+    db_table_accounts_ingame:
+      file: /home/jifo/minecraft/_auxiliary/secrets/db/tables/accounts_ingame.txt
+    bot_poltergeist:
+      file: /home/jifo/minecraft/_auxiliary/secrets/bot_tokens/poltergeist.txt
