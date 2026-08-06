@@ -13,8 +13,7 @@
         file_server browse
         
         # For modules hosted as complete web servers by different services
-        #reverse_proxy /example_name/* localhost:000
-        reverse_proxy /map/* localhost:6967
+        handle_path /map/* { reverse_proxy * localhost:6967 }
         
         # Redirects calls to /modules/ (only has / below, because the /modules prefix is stripped) to their docs
         redir / https://github.com/Team-GhostLand/magic-sauce#web-services permanent
