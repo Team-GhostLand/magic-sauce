@@ -16,6 +16,9 @@
 		handle_path /map/* {
 			reverse_proxy * localhost:6967
 		}
+		handle_path /ghostlandrailwayadministration/* {
+			reverse_proxy * localhost:6769
+		}
 		
 		# Redirects calls to /external/ (only has / below, because the /external prefix is stripped) to the docs
 		redir / https://github.com/Team-GhostLand/magic-sauce#web-services permanent

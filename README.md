@@ -24,7 +24,7 @@ Database.
 ## Web services
 All the paths exposed by the web service. This section effectively serves as the GhostLand API documentation
 * `/external/` - Below are all the services that are external to `web-custom`. However, this path itself redirects here, so that you can see the documentation for the very route you tried to open. Smart, eh?
-* `/external/[name]` - Reverse-proxy for all the services that may be exposed by other parts of the GhostLand system, eg. things like map mods (Create Track Map / Surveyor) or services that „do a lot of stuff”, eg. `bot-account`. Currently, the valid `[name]`s (ie. the services we expose) that won't throw you a `404`, are: `map/` (the webmap)
+* `/external/[name]` - Reverse-proxy for all the services that may be exposed by other parts of the GhostLand system, eg. things like map mods (Create Track Map / Surveyor) or services that „do a lot of stuff”, eg. `bot-account`. Currently, the valid `[name]`s (ie. the services we expose) that won't throw you a `404`, are: `map/` (the webmap), `ghostlandrailwayadministration/` (railway map)
 * `/external/files` - A special endpoint that isn't a reverse proxy, but a mount of `downloads/` (exposed with Caddy's static file server module, with browsing enabled). It's there to let you, well, *download* stuff, ie.:
 * `/external/files/modpacks` - self-explanatory
 * `/external/files/misc` - Various things that „just needed a place to be put somewhere”, eg. old world saves, development modpacks, ultra-legacy modpacks, etc.
